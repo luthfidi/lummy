@@ -1,107 +1,121 @@
-# Lummy - Decentralized Ticket Platform
-
+# Lummy Frontend
 
 <img src="public/lummy-icon.png" alt="Lummy Logo" width="80px">
 
-Lummy is a revolutionary decentralized ticket platform built on the Lisk blockchain. Using NFT technology and IDRX stablecoin payments, Lummy eliminates common issues in the traditional ticketing industry such as counterfeiting, scalping, and complex verification processes. The platform securely and transparently connects event organizers with ticket buyers, ensuring ticket authenticity and giving more control to event organizers.
-
-## Lisk Builders Challenge Submission
-
-This project is being developed for the Lisk Builders Challenge hackathon (March-May 2025).
-
-The Lisk Builders Challenge is an opportunity for developers to turn innovative blockchain ideas into reality. With a 3-month development period featuring workshops and mentorship, the challenge culminates in a Demo Day in Jakarta where the 10 best projects will compete.
-
-### Key Tech Requirements:
-
-- Smart Contract(s) deployed on Lisk Sepolia Testnet or Lisk Mainnet
-- Integration with IDRX Stablecoin on Lisk Mainnet or Testnet
-- Built with Xellar Kit for wallet integration
+Lummy's frontend application is a React-based web interface for the decentralized ticketing platform, providing users with an intuitive experience for browsing events, purchasing tickets, managing NFT tickets, and participating in the secondary market.
 
 ## Technology Stack
 
-- **Frontend**: React with TypeScript, Chakra UI
-- **Blockchain**: Lisk
-- **Wallet Integration**: Xellar Wallet
-- **Payment**: IDRX stablecoin
-- **Authentication**: Web3 wallet authentication
-- **Token Standard**: ERC-721 (NFT) for tickets
+- **Framework**: React with TypeScript
+- **UI Library**: Chakra UI
+- **State Management**: React Context API, useState/useEffect hooks
+- **Routing**: React Router v6
+- **Blockchain Integration**: wagmi, Ethers.js, Xellar Kit
+- **Web3 Wallet**: Xellar Wallet integration
+- **Build Tools**: Vite
+- **Animations**: Framer Motion
+- **Data Visualization**: Recharts
 
-## Core Features
+## Features
 
-### 1. User Features
+### User Features
 
-- Browse events by category, location, date, and price
-- Purchase tickets securely using IDRX
-- Receive NFT tickets in wallet
-- Access QR codes for event entry
-- Transfer tickets to other users
-- Resell tickets on the marketplace (with anti-scalping measures)
-- View ticket history and ownership records
+- **Event Discovery**: Browse events by category, location, date, and price
+- **Ticket Purchase**: Securely buy tickets using IDRX stablecoin
+- **NFT Ticket Management**: View, transfer, and manage NFT tickets in wallet
+- **Dynamic QR Codes**: Access secure, time-based QR codes for event entry
+- **Secondary Market**: Buy and sell tickets with anti-scalping price controls
+- **Wallet Integration**: Connect with Xellar Wallet for blockchain transactions
 
-### 2. Event Organizer Features
+### Event Organizer Features
 
-- Create and manage events
-- Set up ticket tiers with customizable pricing
-- Control reselling parameters (max markup %)
-- Track sales and attendance in real-time
-- Verify tickets at the venue
-- Receive royalties from resales
-
-### 3. Anti-Fraud & Anti-Scalping Features
-
-- Blockchain verification ensures ticket authenticity
-- QR codes change dynamically to prevent screenshots
-- Price ceiling on resales to prevent scalping
-- Transparent ownership history
-- Optional KYC verification for high-security events
+- **Event Management**: Create and manage events with detailed information
+- **Ticket Tiers**: Configure multiple ticket tiers with custom pricing
+- **Sales Analytics**: Track sales and attendance metrics in real-time
+- **Check-in System**: Verify tickets at venues with QR scanning
+- **Resale Controls**: Set rules for secondary market sales
 
 ## Project Structure
 
-### Frontend Pages
+- `/src/components` - Reusable UI components
+- `/src/pages` - Main application pages
+- `/src/hooks` - Custom React hooks for blockchain functionality
+- `/src/context` - React Context providers for global state
+- `/src/services` - API services and blockchain interactions
+- `/src/types` - TypeScript type definitions
+- `/src/utils` - Utility functions
+- `/src/data` - Mock data for development
 
-- **Home Page**: Featured events, category navigation, search functionality
-- **Events Page**: Browse and filter events with comprehensive search options
-- **Event Detail Page**: Complete event information and ticket purchasing
-- **Checkout Process**: Secure IDRX payment via Xellar Wallet
-- **Profile**: User ticket management, transaction history, wallet details
-- **My Tickets**: View, manage, and transfer owned tickets
-- **Marketplace**: Secondary market for ticket reselling with anti-scalping measures
-- **Admin Dashboard**: Event creation and management for organizers
-- **Ticket Management**: Check-in system with QR code scanning for event staff
+## Development Modes
 
-### Key Components
+This application can run in two modes:
 
-- Event catalog with filtering and search
-- Wallet connection and management
-- NFT ticket minting and transfer
-- QR code verification system
-- User authentication and profiles
-- Anti-scalping price controls
-- Transaction history and tracking
+1. **Connected Mode**: Integrates with deployed smart contracts on Lisk Sepolia Testnet
+2. **Mock Mode**: Uses mock data to simulate blockchain functionality (for development)
 
-## Current Development Progress
+## Setup Instructions
 
-- ✅ UI Framework setup with Chakra UI
-- ✅ Page routing structure
-- ✅ User Profile page and components
-- ✅ Home Page enhancement with featured events
-- ✅ Events browsing and filtering system
-- ✅ Ticket Management system for check-ins
-- ✅ Category navigation and filtering
-- ✅ Wallet integration with Xellar Kit
-- 🔄 Event detail page (in progress)
-- 🔄 Smart contract development (in progress)
-- ⬜ Checkout process
-- ⬜ NFT ticket issuance
-- ⬜ Marketplace for reselling
-- ⬜ Admin dashboard for event organizers
+### Prerequisites
 
-## Unique Value Proposition
+- Node.js 16+
+- npm or yarn
 
-Lummy transforms the ticketing experience by:
+### Installation
 
-- **Eliminating fraud**: Blockchain-verified NFT tickets cannot be counterfeited
-- **Fair reselling**: Price caps prevent excessive scalping while allowing legitimate transfers
-- **Transparent ownership**: Complete history of ticket ownership and transfers
-- **Enhanced control**: Event organizers set parameters for resales and receive royalties
-- **Seamless experience**: User-friendly interface despite the advanced technology underneath
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/lummy.git
+   cd lummy/lummy-frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Create a `.env` file with the following variables:
+   ```
+   VITE_LISK_SEPOLIA_RPC_URL=https://rpc.sepolia.lisk.com
+   VITE_WALLETCONNECT_PROJECT_ID=your_project_id
+   VITE_XELLAR_APP_ID=your_xellar_app_id
+   ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. Open your browser to `http://localhost:5173`
+
+## Building for Production
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+The build files will be in the `dist` directory.
+
+## Integration Status
+
+The current integration with smart contracts has some challenges:
+- Reading and writing to Event and TicketNFT contracts has some issues
+- Some features may not work as expected in the integrated version
+
+The frontend-only version using mock data provides a complete user experience for demonstration purposes.
+
+## Deployment
+
+The application is deployed on Vercel:
+
+- Connected version: [https://lummy-ticket.vercel.app/](https://lummy-ticket.vercel.app/)
+- Frontend-only version: [https://lummy-frontend.vercel.app/](https://lummy-frontend.vercel.app/)
+
+## License
+
+MIT
