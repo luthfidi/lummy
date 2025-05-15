@@ -1,0 +1,17 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.29"
+optimizer = true
+optimizer_runs = 200
+
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/"
+]
+
+[rpc_endpoints]
+lisk_sepolia = "${LISK_SEPOLIA_RPC_URL}"
+
+[etherscan]
+lisk_sepolia = { key = "", url = "https://sepolia-blockscout.lisk.com/api" }
