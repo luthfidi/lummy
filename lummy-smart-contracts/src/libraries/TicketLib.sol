@@ -9,7 +9,7 @@ library TicketLib {
         Structs.TicketTier memory tier,
         uint256 quantity
     ) internal pure returns (bool) {
-        // Validasi bahwa tier aktif, dan kuantitas valid
+        // Validate that tier is active and quantity is valid
         require(tier.active, "Ticket tier is not active");
         require(quantity > 0, "Quantity must be greater than zero");
         require(quantity <= tier.maxPerPurchase, "Quantity exceeds max per purchase");
@@ -34,7 +34,7 @@ library TicketLib {
         uint256 resalePrice,
         uint256 maxMarkupPercentage
     ) internal pure returns (bool) {
-        // Validasi bahwa harga resale tidak melebihi maksimum markup
+        // Validate that resale price does not exceed maximum markup
         uint256 maxPrice = originalPrice + ((originalPrice * maxMarkupPercentage) / Constants.BASIS_POINTS);
         require(resalePrice <= maxPrice, "Resale price exceeds maximum allowed markup");
         

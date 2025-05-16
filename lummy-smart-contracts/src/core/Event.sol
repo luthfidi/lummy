@@ -177,13 +177,13 @@ contract Event is IEvent, ReentrancyGuard, Ownable {
         if(_tierId >= tierCount) revert TierDoesNotExist();
         Structs.TicketTier storage tier = ticketTiers[_tierId];
         
-        // Validasi pembelian
+        // Purchase validation
         if(!TicketLib.validateTicketPurchase(tier, _quantity)) revert InvalidPurchaseRequest();
         
         // Calculate total price
         uint256 totalPrice = tier.price * _quantity;
         
-        // Transfer IDRX token dari pembeli ke kontrak event
+        // Transfer IDRX token from buyer to event contract
         if(!idrxToken.transferFrom(msg.sender, address(this), totalPrice)) revert TokenTransferFailed();
         
         // Calculate platform fee

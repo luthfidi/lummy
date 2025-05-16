@@ -23,13 +23,13 @@ error InvalidTimestamp();
 contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
     using Counters for Counters.Counter;
     
-    // Variabel state
+    // State variables
     Counters.Counter private _tokenIdCounter;
     address public eventContract;
     mapping(uint256 => Structs.TicketMetadata) public ticketMetadata;
     mapping(uint256 => uint256) public transferCount;
     
-    // Secret salt untuk QR challenge
+    // Secret salt for QR challenge
     bytes32 private immutable _secretSalt;
     
     modifier onlyEventContract() {
@@ -65,7 +65,7 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
         uint256 tierId,
         uint256 originalPrice
     ) external override onlyEventContract nonReentrant returns (uint256) {
-        // Mint tiket baru
+        // Mint new ticket
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         
@@ -73,14 +73,14 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
         
         // Set metadata
         ticketMetadata[tokenId] = Structs.TicketMetadata({
-            eventId: 0, // Set 0 karena event ID bersifat implisit dari kontrak
+            eventId: 0,
             tierId: tierId,
             originalPrice: originalPrice,
             used: false,
             purchaseDate: block.timestamp
         });
         
-        // Inisialisasi transfer count
+        // Initialize transfer count
         transferCount[tokenId] = 0;
         
         // Emit event
@@ -109,9 +109,9 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
         
         address owner = ownerOf(tokenId);
         
-        // Generate dynamic QR challenge dengan timestamp saat ini
-        // Bagi timestamp dengan VALIDITY_WINDOW untuk membuat blok waktu
-        // QR code akan berubah setiap VALIDITY_WINDOW detik
+        // Generate dynamic QR challenge with current timestamp
+        // Divide timestamp by VALIDITY_WINDOW to create time blocks
+        // QR code will change every VALIDITY_WINDOW seconds
         uint256 timeBlock = block.timestamp / Constants.VALIDITY_WINDOW;
         
         return keccak256(abi.encodePacked(
@@ -132,10 +132,10 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
         if(ticketMetadata[tokenId].used) revert TicketAlreadyUsed();
         if(ownerOf(tokenId) != owner) revert InvalidOwner();
         
-        // Validasi timestamp
+        // Validate timestamp
         if(!SecurityLib.validateChallenge(timestamp, Constants.VALIDITY_WINDOW * 2)) revert InvalidTimestamp();
         
-        // Buat challenge seperti di generateQRChallenge
+        // Create challenge as in generateQRChallenge
         uint256 timeBlock = timestamp / Constants.VALIDITY_WINDOW;
         bytes32 challenge = keccak256(abi.encodePacked(
             tokenId,
@@ -144,7 +144,7 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
             _secretSalt
         ));
         
-        // Recover signer dari signature dan pastikan itu adalah owner
+        // Recover signer from signature and ensure it is the owner
         address signer = SecurityLib.recoverSigner(challenge, signature);
         return signer == owner;
     }
@@ -173,8 +173,8 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if(!_exists(tokenId)) revert TicketDoesNotExist();
         
-        // Dalam implementasi sebenarnya, bisa dikembangkan untuk mengembalikan URI yang sesuai
-        // misalnya metadata dari IPFS berdasarkan tokenId dan metadata event
+        // In the actual implementation, this could be developed to return the appropriate URI
+        // for example, metadata from IPFS based on tokenId and event metadata
         return "https://example.com/api/ticket/metadata";
     }
     

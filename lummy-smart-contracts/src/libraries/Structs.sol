@@ -2,7 +2,7 @@
 pragma solidity 0.8.29;
 
 library Structs {
-    // Detail event
+    // Event details
     struct EventDetails {
         string name;
         string description;
@@ -12,7 +12,7 @@ library Structs {
         address organizer;
     }
     
-    // Tier tiket
+    // Ticket tier
     struct TicketTier {
         string name;
         uint256 price;
@@ -22,7 +22,7 @@ library Structs {
         bool active;
     }
     
-    // Aturan resale
+    // Resale rules
     struct ResaleRules {
         bool allowResell;
         uint256 maxMarkupPercentage;
@@ -32,7 +32,7 @@ library Structs {
         bool requireVerification;
     }
     
-    // Metadata tiket
+    // Ticket metadata
     struct TicketMetadata {
         uint256 eventId;
         uint256 tierId;
@@ -41,7 +41,7 @@ library Structs {
         uint256 purchaseDate;
     }
     
-    // Informasi listing marketplace
+    // Marketplace listing information
     struct ListingInfo {
         address seller;
         uint256 price;
