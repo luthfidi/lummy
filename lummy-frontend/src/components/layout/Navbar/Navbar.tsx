@@ -27,7 +27,7 @@ const Links = [
   { name: "Events", path: "/events" },
   { name: "Marketplace", path: "/marketplace" },
   { name: "My Tickets", path: "/tickets" },
-  { name: "Admin", path: "/admin" },
+  { name: "Organizer", path: "/admin" },
   { name: "Profile", path: "/profile" },
 ];
 

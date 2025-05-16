@@ -8,7 +8,7 @@ import {
   Link,
   HStack,
 } from "@chakra-ui/react";
-import { FaDiscord, FaInstagram, FaFacebook } from "react-icons/fa";
+import { FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 const ListHeader = ({ children }: { children: ReactNode }) => {
@@ -90,24 +90,14 @@ export const Footer = () => {
             <ListHeader>Connect</ListHeader>
             <HStack spacing={4}>
               <SocialIcon
-                icon={<FaDiscord size="20px" />}
-                label="Discord"
-                href="#"
+                icon={<FaInstagram size="20px" />}
+                label="Instagram"
+                href="https://www.instagram.com/lummy.ticket/"
               />
               <SocialIcon
                 icon={<FaXTwitter size="20px" />}
                 label="Twitter"
-                href="#"
-              />
-              <SocialIcon
-                icon={<FaInstagram size="20px" />}
-                label="Instagram"
-                href="#"
-              />
-              <SocialIcon
-                icon={<FaFacebook size="20px" />}
-                label="Facebook"
-                href="#"
+                href="https://www.x.com/lummy_ticket/"
               />
             </HStack>
           </Stack>

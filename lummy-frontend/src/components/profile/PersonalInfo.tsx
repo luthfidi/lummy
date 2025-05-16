@@ -106,7 +106,6 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({ initialData, onSave }) => {
                     border="1px solid"
                     borderColor="gray.200"
                     borderRadius="md"
-                    fontFamily="monospace"
                     fontSize="sm"
                     py={2}
                     px={3}
