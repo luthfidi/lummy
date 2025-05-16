@@ -1,5 +1,5 @@
-// Simulasi integrasi dengan Xellar Wallet SDK
-// Dalam implementasi nyata, ini akan menggunakan SDK asli dari Xellar
+// Simulation of Xellar Wallet SDK integration
+// In a real implementation, this would use the native SDK from Xellar
 
 export interface XellarWallet {
   address: string;
@@ -27,7 +27,7 @@ export interface TransactionResult {
   error?: string;
 }
 
-// Simulasi singleton wallet instance
+// Simulation of singleton wallet instance
 class XellarSDK {
   private static instance: XellarSDK;
   private wallet: XellarWallet | null = null;
@@ -35,7 +35,7 @@ class XellarSDK {
   private listeners: Array<(wallet: XellarWallet | null) => void> = [];
 
   private constructor() {
-    // Private constructor untuk memastikan singleton pattern
+    // Private constructor to ensure singleton pattern
   }
 
   public static getInstance(): XellarSDK {
@@ -46,12 +46,12 @@ class XellarSDK {
   }
 
   public isAvailable(): boolean {
-    // Simulasi pengecekan apakah Xellar tersedia di browser
+    // Simulates checking if Xellar is available in the browser
     return true;
   }
 
   public async connect(): Promise<XellarWallet | null> {
-    // Simulasi proses koneksi ke wallet
+    // Simulates wallet connection process
     return new Promise((resolve) => {
       setTimeout(() => {
         this.wallet = {

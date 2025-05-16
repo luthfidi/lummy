@@ -1,4 +1,3 @@
-// src/pages/EventDetail/EventDetailPage.tsx
 import React, { useState, useEffect, useRef, JSX } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -50,7 +49,7 @@ import { mockEvents } from "../../data/mockEvents";
 import { Event, TicketTier } from "../../types/Event";
 import { CountdownTimer } from "../../components/core/CountdownTimer";
 import { TicketTierCard } from "../../components/composite/TicketTierCard";
-import { useSmartContract } from "../../hooks/useSmartContract"; // Import hook smart contract
+import { useSmartContract } from "../../hooks/useSmartContract";
 
 // Helper function to format date
 const formatDate = (dateString: string): string => {

@@ -68,8 +68,15 @@ const ResellSettings: React.FC<ResellSettingsProps> = ({
   };
 
   return (
-    <Box bg={cardBg} borderRadius="md" p={6} border="2px solid" borderColor="gray.200" rounded="xl">
-      <VStack spacing={6} align="stretch" >
+    <Box
+      bg={cardBg}
+      borderRadius="md"
+      p={6}
+      border="2px solid"
+      borderColor="gray.200"
+      rounded="xl"
+    >
+      <VStack spacing={6} align="stretch">
         <Text fontSize="xl" fontWeight="bold">
           Ticket Resale Settings
         </Text>

@@ -74,7 +74,7 @@ export const mockTickets: Ticket[] = [
     tokenId: "NFT-23456789",
     ownerAddress: "0x1234567890abcdef1234567890abcdef12345678",
   },
-    {
+  {
     id: "ticket-4",
     eventId: "event-5",
     eventName: "Liga Indonesia Championship Finals",

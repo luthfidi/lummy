@@ -17,6 +17,11 @@ import {
 import { CheckInDashboard, ScannerPage } from "./pages/TicketManagement";
 import { Web3Provider } from "./services/Web3Provider";
 
+/**
+ * Main application component defining the routing structure.
+ * Wraps the entire application in the Web3Provider for blockchain connectivity.
+ * Maintains a consistent layout with Navbar and Footer across all routes.
+ */
 function App() {
   return (
     <Web3Provider>

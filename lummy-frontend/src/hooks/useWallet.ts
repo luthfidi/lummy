@@ -13,7 +13,6 @@ export const useWallet = () => {
       address.length - length
     )}`;
   }, []);
-  
 
   const isWalletReady = useCallback(() => {
     return context.isConnected && !context.isConnecting;

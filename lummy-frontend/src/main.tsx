@@ -7,6 +7,14 @@ import theme from "./styles/theme";
 import { WalletProvider } from "./context/WalletContext";
 import "./index.css";
 
+/**
+ * Application entry point.
+ * Sets up:
+ * - React strict mode
+ * - Light color mode with Chakra UI
+ * - Wallet context for blockchain integration
+ * - Browser routing for navigation
+ */
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* Force light mode */}

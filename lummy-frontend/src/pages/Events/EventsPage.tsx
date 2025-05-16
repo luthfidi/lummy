@@ -1,4 +1,3 @@
-// src/pages/Events/EventsPage.tsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -43,18 +42,23 @@ const EventsPage: React.FC = () => {
   const [sortBy, setSortBy] = useState("date-asc");
 
   // Import smart contract hook
-  const { getEvents, getEventDetails, loading: contractLoading, error: contractError } = useSmartContract();
+  const {
+    getEvents,
+    getEventDetails,
+    loading: contractLoading,
+    error: contractError,
+  } = useSmartContract();
 
   // Load events from blockchain
   useEffect(() => {
     const fetchEvents = async () => {
       setIsLoading(true);
       setErrorMsg(null);
-      
+
       try {
         // Get event addresses from factory
         const eventAddresses = await getEvents();
-        
+
         if (eventAddresses && eventAddresses.length > 0) {
           // Get details for each event
           const eventPromises = eventAddresses.map(async (address) => {
@@ -68,7 +72,8 @@ const EventsPage: React.FC = () => {
                 date: new Date(Number(details.date) * 1000).toISOString(), // Convert timestamp to ISO string
                 location: details.venue,
                 venue: details.venue,
-                imageUrl: "https://images.unsplash.com/photo-1459865264687-595d652de67e", // Default image
+                imageUrl:
+                  "https://images.unsplash.com/photo-1459865264687-595d652de67e", // Default image
                 price: 0, // Will be updated with ticket tiers later
                 currency: "IDRX",
                 category: "Event", // Default category
@@ -99,10 +104,10 @@ const EventsPage: React.FC = () => {
       } catch (error) {
         console.error("Error fetching events:", error);
         setErrorMsg(
-          contractError || 
-          "Failed to load events from blockchain. Using sample data instead."
+          contractError ||
+            "Failed to load events from blockchain. Using sample data instead."
         );
-        
+
         // Fallback to mock data
         setEvents(mockEvents);
         setFilteredEvents(mockEvents);
@@ -233,11 +238,11 @@ const EventsPage: React.FC = () => {
   const categories = Array.from(
     new Set(filteredEvents.map((event) => event.category))
   );
-  
+
   const locations = Array.from(
     new Set(filteredEvents.map((event) => event.location))
   );
-  
+
   const statuses = ["available", "limited", "soldout"];
 
   return (

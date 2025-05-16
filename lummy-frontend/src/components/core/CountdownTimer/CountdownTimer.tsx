@@ -42,10 +42,14 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
     const timer = setInterval(() => {
       const calculated = calculateTimeLeft();
       setTimeLeft(calculated);
-      
+
       // Check if countdown has reached zero
-      if (calculated.days === 0 && calculated.hours === 0 && 
-          calculated.minutes === 0 && calculated.seconds === 0) {
+      if (
+        calculated.days === 0 &&
+        calculated.hours === 0 &&
+        calculated.minutes === 0 &&
+        calculated.seconds === 0
+      ) {
         setIsExpired(true);
         clearInterval(timer);
       }
@@ -72,19 +76,10 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   }
 
   return (
-    <Flex 
-      justify="center" 
-      width="100%" 
-      my={2}
-    >
+    <Flex justify="center" width="100%" my={2}>
       <HStack spacing={{ base: 2, md: 4 }} justify="center" width="100%">
         {timeUnits.map((unit, index) => (
-          <VStack 
-            key={index} 
-            spacing={0} 
-            flex="1"
-            maxW="100px"
-          >
+          <VStack key={index} spacing={0} flex="1" maxW="100px">
             <Box
               bg="purple.100"
               borderRadius="md"
@@ -95,11 +90,20 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
               borderColor="purple.200"
               textAlign="center"
             >
-              <Text fontWeight="bold" fontSize={{ base: "xl", md: "2xl" }} color="purple.700">
+              <Text
+                fontWeight="bold"
+                fontSize={{ base: "xl", md: "2xl" }}
+                color="purple.700"
+              >
                 {unit.value.toString().padStart(2, "0")}
               </Text>
             </Box>
-            <Text fontSize={{ base: "xs", md: "sm" }} color="purple.600" mt={1} fontWeight="medium">
+            <Text
+              fontSize={{ base: "xs", md: "sm" }}
+              color="purple.600"
+              mt={1}
+              fontWeight="medium"
+            >
               {unit.label}
             </Text>
           </VStack>

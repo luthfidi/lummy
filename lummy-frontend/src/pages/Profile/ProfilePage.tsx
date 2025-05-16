@@ -1,4 +1,3 @@
-// src/pages/Profile/ProfilePage.tsx
 import React from "react";
 import {
   Container,
@@ -16,7 +15,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FaUser, FaWallet, FaHistory } from "react-icons/fa";
-import { useAccount, useBalance } from "wagmi"; // Tambahkan useBalance
+import { useAccount, useBalance } from "wagmi";
 import { ConnectButton } from "@xellar/kit";
 import {
   PersonalInfo,

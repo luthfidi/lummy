@@ -163,7 +163,7 @@ const EventManagement: React.FC = () => {
   const [resellSettings, setResellSettings] =
     useState<ResellSettingsData | null>(null);
 
-  // State dan handler untuk modal form ticket tier
+  // State and handler for ticket tier modal form
   const [editingTier, setEditingTier] = useState<EditableTier | null>(null);
   const [isNewTier, setIsNewTier] = useState(false);
   const {
@@ -243,7 +243,7 @@ const EventManagement: React.FC = () => {
     navigate("/admin");
   };
 
-  // Handlers untuk mengedit dan menambah tier
+  // Handlers for editing and adding tiers
   const handleEditTier = (tier: any) => {
     setEditingTier({
       id: tier.id || `tier-${Date.now()}`,
@@ -274,7 +274,7 @@ const EventManagement: React.FC = () => {
     openTierModal();
   };
 
-  // Handler untuk perubahan pada form
+  // Handler for form changes
   const handleTierInputChange = (field: keyof EditableTier, value: any) => {
     if (editingTier) {
       setEditingTier({
@@ -284,7 +284,7 @@ const EventManagement: React.FC = () => {
     }
   };
 
-  // Handler untuk menyimpan perubahan
+  // Handler to save changes
   const handleSaveTier = () => {
     if (!editingTier || !event) return;
 

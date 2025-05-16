@@ -12,12 +12,12 @@ export const QRCode: React.FC<QRCodeProps> = ({
   eventId,
   size = 200,
 }) => {
-  // Dalam implementasi nyata, ini akan diganti dengan generate QR code sebenarnya
-  // menggunakan library seperti qrcode.react
+  // In a real implementation, this would be replaced with actual QR code generation
+  // using libraries like qrcode.react
   const [timeKey, setTimeKey] = useState<number>(Date.now());
 
-  // Untuk demo, kita akan ubah QR code setiap 10 detik
-  // Ini mensimulasikan QR code dinamis yang berubah secara berkala untuk keamanan
+  // For demo purposes, we'll change the QR code every 10 seconds
+  // This simulates dynamic QR codes that change periodically for security
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeKey(Date.now());
@@ -26,7 +26,7 @@ export const QRCode: React.FC<QRCodeProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Placeholder untuk QR code
+  // Placeholder for QR code
   return (
     <VStack spacing={2}>
       <Box

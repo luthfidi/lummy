@@ -94,7 +94,7 @@ const CreateEventForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validasi form
+    // Form validation
     if (
       !eventData.title ||
       !eventData.date ||
@@ -113,14 +113,14 @@ const CreateEventForm: React.FC = () => {
 
     const eventDate = new Date(`${eventData.date}T${eventData.time}`);
 
-    // Panggil fungsi createEvent dari hook
+    // Call createEvent function from hook
     try {
       const eventAddress = await createEvent(
         eventData.title,
         eventData.description,
         eventDate,
         eventData.venue || eventData.address,
-        "" // ipfsMetadata (kosong untuk saat ini)
+        "" // ipfsMetadata (empty for now)
       );
 
       if (eventAddress) {
@@ -132,7 +132,7 @@ const CreateEventForm: React.FC = () => {
           isClosable: true,
         });
 
-        // Untuk demo, kita langsung redirect ke dashboard
+        // For demo, directly redirect to dashboard
         navigate("/admin");
       } else {
         toast({
