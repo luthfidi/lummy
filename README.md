@@ -63,10 +63,55 @@ See the individual README files in each directory for specific setup instruction
 - [Frontend README](lummy-frontend/README.md)
 - [Smart Contracts README](lummy-smart-contracts/README.md)
 
-## License
-
-MIT
-
 ## Acknowledgements
 
 This project was developed for the Lisk Builders Challenge hackathon (March-May 2025).
+
+## Contributors
+
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%">
+        <a href="https://github.com/luthfidi">
+           <img src="https://avatars.githubusercontent.com/u/114864625?v=4?s=100" width="100px" alt="Luthfi Hadi" />
+          <br />
+          <sub><b>LUTHFI HADI</b></sub>
+        </a>
+        <br />Full Stack Developer
+      </td>
+      <td align="center" valign="top" width="14.28%">
+        <a href="https://github.com/cizyypie">
+          <img src="https://avatars.githubusercontent.com/u/140790736?v=4?s=100" width="100px" alt="Joanita Panggalo" />
+          <br />
+          <sub><b>JOANITA PANGGALO</b></sub>
+        </a>
+        <br /> Front End Developer
+      </td>
+      <td align="center" valign="top" width="14.28%">
+        <a href="https://github.com/zahrasngk">
+          <img src="https://avatars.githubusercontent.com/u/178831251?v=4?s=100" width="100px" alt="Zahra Sasongko" />
+          <br />
+          <sub><b>ZAHRA SASONGKO</b></sub>
+        </a>
+        <br />Smart Contract Developer
+      </td>
+      <td align="center" valign="top" width="14.28%">
+        <a href="https://www.instagram.com/raffaryn_">
+          <img src="https://ui-avatars.com/api/?size=100&name=RAFFA+NUGRAHA" width="100px" alt="Raffa Nugraha" />
+          <br />
+          <sub><b>RAFFA NUGRAHA</b></sub>
+        </a>
+        <br />UI/UX Designer
+      </td>
+      <td align="center" valign="top" width="14.28%">
+        <a href="https://github.com/ardtys">
+          <img src="https://avatars.githubusercontent.com/u/114295960?v=4?s=100" width="100px" alt="Daffa Rifki Arditya" />
+          <br />
+          <sub><b>DAFFA RIFKI ARDITYA</b></sub>
+        </a>
+        <br />Back End Developer
+      </td>
+    </tr>
+  </tbody>
+</table>

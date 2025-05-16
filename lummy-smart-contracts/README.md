@@ -160,7 +160,3 @@ function purchaseResaleTicket(uint256 tokenId) external;
 - Custom error selectors for gas optimization
 - Validation checks for all input parameters
 - Time-based verification for ticket QR codes
-
-## License
-
-MIT

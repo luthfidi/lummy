@@ -115,7 +115,3 @@ The application is deployed on Vercel:
 
 - Connected version: [https://lummy-ticket.vercel.app/](https://lummy-ticket.vercel.app/)
 - Frontend-only version: [https://lummy-frontend.vercel.app/](https://lummy-frontend.vercel.app/)
-
-## License
-
-MIT
