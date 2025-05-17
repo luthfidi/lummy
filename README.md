@@ -1,4 +1,4 @@
-# Lummy - Decentralized Ticket Platform
+# Lummy - Decentralized Ticketing Platform
 
 <img src="lummy-frontend/public/lummy-icon.png" alt="Lummy Logo" width="80px">
 
