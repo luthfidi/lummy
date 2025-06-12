@@ -1,5 +1,6 @@
-import { Box, Container } from "@chakra-ui/react";
+import { Box, Container, useDisclosure } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import {
   HeroSection,
   FeatureSection,
@@ -7,14 +8,31 @@ import {
   TestimonialSection,
 } from "../../components/home";
 import { FeaturedEvents, CategoryNav } from "../../components/events";
+import { DevelopmentNoticeModal } from "../../components/common/DevelopmentNoticeModal";
 import { mockEvents } from "../../data/mockEvents";
-import { useEffect, useState } from "react";
 import { Event } from "../../types/Event";
-// Removed unused import: import {ConnectButton} from "@xellar/kit";
 
 export const HomePage = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Check if user has seen the development notice in this session
+  useEffect(() => {
+    const hasSeenNotice = sessionStorage.getItem("hasSeenDevNotice");
+    if (!hasSeenNotice) {
+      // Small delay to let the page load first
+      setTimeout(() => {
+        onOpen();
+      }, 1000);
+    }
+  }, [onOpen]);
+
+  // Handle modal close
+  const handleModalClose = () => {
+    sessionStorage.setItem("hasSeenDevNotice", "true");
+    onClose();
+  };
 
   useEffect(() => {
     // Simulate API call to fetch events
@@ -38,6 +56,9 @@ export const HomePage = () => {
 
   return (
     <Box>
+      {/* Development Notice Modal */}
+      <DevelopmentNoticeModal isOpen={isOpen} onClose={handleModalClose} />
+
       {/* Hero Section */}
       <HeroSection />
 

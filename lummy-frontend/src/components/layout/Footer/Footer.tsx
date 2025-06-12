@@ -8,8 +8,8 @@ import {
   Link,
   HStack,
 } from "@chakra-ui/react";
-import { FaInstagram } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
+import { FaInstagram, FaLinkedin } from "react-icons/fa";
+import { FaXTwitter, FaTiktok } from "react-icons/fa6";
 
 const ListHeader = ({ children }: { children: ReactNode }) => {
   return (
@@ -44,6 +44,7 @@ const SocialIcon = ({ icon, label, href }: SocialIconProps) => {
       _hover={{
         bg: "blackAlpha.200",
         color: "gray.900",
+        transform: "translateY(-2px)",
       }}
     >
       {icon}
@@ -88,16 +89,26 @@ export const Footer = () => {
 
           <Stack align={"flex-start"}>
             <ListHeader>Connect</ListHeader>
-            <HStack spacing={4}>
+            <HStack spacing={3} flexWrap="wrap">
               <SocialIcon
-                icon={<FaInstagram size="20px" />}
+                icon={<FaInstagram size="18px" />}
                 label="Instagram"
                 href="https://www.instagram.com/lummy.ticket/"
               />
               <SocialIcon
-                icon={<FaXTwitter size="20px" />}
+                icon={<FaXTwitter size="18px" />}
                 label="Twitter"
                 href="https://www.x.com/lummy_ticket/"
+              />
+              <SocialIcon
+                icon={<FaTiktok size="18px" />}
+                label="TikTok"
+                href="https://www.tiktok.com/@lummy.ticket"
+              />
+              <SocialIcon
+                icon={<FaLinkedin size="18px" />}
+                label="LinkedIn"
+                href="https://www.linkedin.com/company/lummy-ticket/"
               />
             </HStack>
           </Stack>
