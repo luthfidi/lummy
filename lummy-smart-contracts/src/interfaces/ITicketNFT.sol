@@ -2,7 +2,7 @@
 pragma solidity 0.8.29;
 
 import "src/libraries/Structs.sol";
-import "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 // Updated interface to extend IERC721 instead of duplicating methods
 interface ITicketNFT is IERC721 {

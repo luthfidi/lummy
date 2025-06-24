@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.29;
 
-import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
-import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "src/libraries/Structs.sol";
 import "src/libraries/Constants.sol";
 import "src/interfaces/IEventFactory.sol";
-import "src/core/Event.sol"; // Changed from IEvent to Event for actual implementation
+import "src/core/Event.sol";
 import "src/core/EventDeployer.sol";
 
 // Custom errors to reduce bytecode size
@@ -21,7 +21,7 @@ contract EventFactory is IEventFactory, Ownable {
     EventDeployer public deployer;
     
     // Constructor
-    constructor(address _idrxToken) {
+    constructor(address _idrxToken) Ownable(msg.sender) {
         if(_idrxToken == address(0)) revert InvalidAddress();
         idrxToken = _idrxToken;
         platformFeeReceiver = msg.sender;
@@ -38,17 +38,20 @@ contract EventFactory is IEventFactory, Ownable {
     ) external override returns (address) {
         if(_date <= block.timestamp) revert EventDateMustBeInFuture();
         
+        // Create deploy parameters struct
+        EventDeployer.DeployParams memory params = EventDeployer.DeployParams({
+            sender: msg.sender,
+            name: _name,
+            description: _description,
+            date: _date,
+            venue: _venue,
+            ipfsMetadata: _ipfsMetadata,
+            idrxToken: idrxToken,
+            platformFeeReceiver: platformFeeReceiver
+        });
+        
         // Use the deployer contract to create event and ticket
-        (address eventAddress,) = deployer.deployEventAndTicket(
-            msg.sender,
-            _name,
-            _description,
-            _date,
-            _venue,
-            _ipfsMetadata,
-            idrxToken,
-            platformFeeReceiver
-        );
+        (address eventAddress,) = deployer.deployEventAndTicket(params);
         
         // Add to events list
         events.push(eventAddress);
@@ -65,7 +68,7 @@ contract EventFactory is IEventFactory, Ownable {
     
     // Get event details
     function getEventDetails(address eventAddress) external view override returns (Structs.EventDetails memory) {
-        Event eventContract = Event(eventAddress); // Using direct cast to Event
+        Event eventContract = Event(eventAddress);
         
         return Structs.EventDetails({
             name: eventContract.name(),

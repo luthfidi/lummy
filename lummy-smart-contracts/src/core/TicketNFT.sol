@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.29;
 
-import "lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
-import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
-import "lib/openzeppelin-contracts/contracts/utils/structs/EnumerableSet.sol";
-import "lib/openzeppelin-contracts/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "src/libraries/Structs.sol";
 import "src/libraries/Constants.sol";
 import "src/libraries/SecurityLib.sol";
@@ -21,10 +19,9 @@ error InvalidOwner();
 error InvalidTimestamp();
 
 contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
-    using Counters for Counters.Counter;
     
     // State variables
-    Counters.Counter private _tokenIdCounter;
+    uint256 private _tokenIdCounter;
     address public eventContract;
     mapping(uint256 => Structs.TicketMetadata) public ticketMetadata;
     mapping(uint256 => uint256) public transferCount;
@@ -37,8 +34,21 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
         _;
     }
     
-    constructor() ERC721("Ticket", "TIX") {
+    constructor() ERC721("Ticket", "TIX") Ownable(msg.sender) {
         _secretSalt = keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender));
+    }
+    
+    // Helper function to check if token exists
+    function _tokenExists(uint256 tokenId) internal view returns (bool) {
+        return _ownerOf(tokenId) != address(0);
+    }
+    
+    // Helper function to check if sender is approved or owner
+    function _isApprovedOrOwner(address spender, uint256 tokenId) internal view returns (bool) {
+        address owner = ownerOf(tokenId);
+        return (spender == owner || 
+                isApprovedForAll(owner, spender) || 
+                getApproved(tokenId) == spender);
     }
     
     function initialize(
@@ -66,8 +76,8 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
         uint256 originalPrice
     ) external override onlyEventContract nonReentrant returns (uint256) {
         // Mint new ticket
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
+        uint256 tokenId = _tokenIdCounter;
+        _tokenIdCounter++;
         
         _safeMint(to, tokenId);
         
@@ -104,7 +114,7 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
     }
     
     function generateQRChallenge(uint256 tokenId) external view override returns (bytes32) {
-        if(!_exists(tokenId)) revert TicketDoesNotExist();
+        if(!_tokenExists(tokenId)) revert TicketDoesNotExist();
         if(ticketMetadata[tokenId].used) revert TicketAlreadyUsed();
         
         address owner = ownerOf(tokenId);
@@ -128,7 +138,7 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
         uint256 timestamp,
         bytes memory signature
     ) external view override returns (bool) {
-        if(!_exists(tokenId)) revert TicketDoesNotExist();
+        if(!_tokenExists(tokenId)) revert TicketDoesNotExist();
         if(ticketMetadata[tokenId].used) revert TicketAlreadyUsed();
         if(ownerOf(tokenId) != owner) revert InvalidOwner();
         
@@ -150,7 +160,7 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
     }
     
     function useTicket(uint256 tokenId) external override onlyEventContract {
-        if(!_exists(tokenId)) revert TicketDoesNotExist();
+        if(!_tokenExists(tokenId)) revert TicketDoesNotExist();
         if(ticketMetadata[tokenId].used) revert TicketAlreadyUsed();
         
         // Mark ticket as used
@@ -161,17 +171,17 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
     }
     
     function getTicketMetadata(uint256 tokenId) external view override returns (Structs.TicketMetadata memory) {
-        if(!_exists(tokenId)) revert TicketDoesNotExist();
+        if(!_tokenExists(tokenId)) revert TicketDoesNotExist();
         return ticketMetadata[tokenId];
     }
     
     function markTransferred(uint256 tokenId) external override onlyEventContract {
-        if(!_exists(tokenId)) revert TicketDoesNotExist();
+        if(!_tokenExists(tokenId)) revert TicketDoesNotExist();
         transferCount[tokenId]++;
     }
     
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        if(!_exists(tokenId)) revert TicketDoesNotExist();
+        if(!_tokenExists(tokenId)) revert TicketDoesNotExist();
         
         // In the actual implementation, this could be developed to return the appropriate URI
         // for example, metadata from IPFS based on tokenId and event metadata
