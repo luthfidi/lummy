@@ -64,7 +64,7 @@ This application can run in two modes:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/lummy.git
+   git clone https://github.com/luthfidi/lummy.git
    cd lummy/lummy-frontend
    ```
 
