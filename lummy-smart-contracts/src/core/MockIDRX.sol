@@ -1,4 +1,6 @@
-// MockIDRX.sol
+// SPDX-License-Identifier: MIT
+// use for testing purpose
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
