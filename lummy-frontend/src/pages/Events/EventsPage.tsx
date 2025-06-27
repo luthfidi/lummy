@@ -19,6 +19,7 @@ import { EventCard } from "../../components/core/Card";
 import { mockEvents } from "../../data/mockEvents";
 import { Event } from "../../types/Event";
 import { EventsFilter, EventsSorter } from "../../components/events";
+import { useSmartContract } from "../../hooks/useSmartContract";
 
 const EventsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -27,8 +28,8 @@ const EventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [useBlockchain, setUseBlockchain] = useState(false);
-  const [hasTriedBlockchain, setHasTriedBlockchain] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [usingMockData, setUsingMockData] = useState(false);
 
   // Extract URL parameters
   const categoryFromUrl = searchParams.get("category") || "";
@@ -42,68 +43,101 @@ const EventsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [sortBy, setSortBy] = useState("date-asc");
 
-  // Simple one-time blockchain attempt
+  // Import smart contract hook
+  const { getEvents, getEventDetails } = useSmartContract();
+
+  // SIMPLIFIED: Load events only once, no retry loops
   useEffect(() => {
-    const loadEvents = async () => {
+    let isMounted = true; // Prevent state updates if component unmounted
+
+    const fetchEvents = async () => {
       setIsLoading(true);
+      setErrorMsg(null);
 
-      // If we haven't tried blockchain yet, try once
-      if (!hasTriedBlockchain && !useBlockchain) {
-        try {
+      try {
+        // Try to get events from blockchain
+        console.log("Attempting to fetch events from blockchain...");
+        const eventAddresses = await getEvents();
 
+        if (!isMounted) return; // Component unmounted, don't continue
+
+        if (eventAddresses && eventAddresses.length > 0) {
+          console.log("Found blockchain events:", eventAddresses);
           
-          // Try to get events from blockchain - but only once
-          setHasTriedBlockchain(true);
-          
-          // For now, just use mock data to prevent loops
-          // In production, you would implement proper blockchain fetching here
-          console.log("Attempting blockchain connection...");
-          
-          // Simulate blockchain attempt
-          setTimeout(() => {
-            console.log("Blockchain connection failed, using mock data");
-            setEvents(mockEvents);
-            setFilteredEvents(mockEvents);
-            setIsLoading(false);
-          }, 1000);
-          
-        } catch (error) {
-          console.log("Blockchain not available, using mock data");
-          setEvents(mockEvents);
-          setFilteredEvents(mockEvents);
-          setIsLoading(false);
+          // Get details for each event (but limit to prevent too many calls)
+          const limitedAddresses = eventAddresses.slice(0, 5); // Max 5 events to prevent spam
+          const eventPromises = limitedAddresses.map(async (address) => {
+            try {
+              const details = await getEventDetails(address);
+              if (details) {
+                return {
+                  id: address,
+                  title: details.name,
+                  description: details.description,
+                  date: new Date(Number(details.date) * 1000).toISOString(),
+                  location: details.venue,
+                  venue: details.venue,
+                  imageUrl: "https://images.unsplash.com/photo-1459865264687-595d652de67e",
+                  price: 0,
+                  currency: "IDRX",
+                  category: "Event",
+                  status: "available" as const,
+                  organizer: {
+                    id: details.organizer,
+                    name: "Event Organizer",
+                    verified: true,
+                    description: "Event organizer",
+                  },
+                  ticketsAvailable: 0,
+                } as Event;
+              }
+              return null;
+            } catch (error) {
+              console.log("Failed to get details for event:", address);
+              return null;
+            }
+          });
+
+          const eventsData = (await Promise.all(eventPromises)).filter(
+            (event): event is Event => event !== null
+          );
+
+          if (!isMounted) return;
+
+          if (eventsData.length > 0) {
+            setEvents(eventsData);
+            setFilteredEvents(eventsData);
+            setUsingMockData(false);
+          } else {
+            throw new Error("No valid event data found");
+          }
+        } else {
+          throw new Error("No events found on blockchain");
         }
-      } else {
-        // Use mock data directly
+      } catch (error) {
+        console.log("Blockchain fetch failed, using mock data:", error);
+        
+        if (!isMounted) return;
+
+        // Fallback to mock data immediately - NO RETRY
         setEvents(mockEvents);
         setFilteredEvents(mockEvents);
-        setIsLoading(false);
+        setUsingMockData(true);
+        setErrorMsg("Using demo data - blockchain connection unavailable");
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    loadEvents();
-  }, []); // Empty dependency array - only run once
+    fetchEvents();
 
-  // Handle manual blockchain retry
-  const handleRetryBlockchain = async () => {
-    setIsLoading(true);
-    setUseBlockchain(true);
-    
-    try {
-      // Here you would implement actual blockchain fetching
-      // For now, just show mock data after delay
-      setTimeout(() => {
-        setEvents(mockEvents);
-        setFilteredEvents(mockEvents);
-        setIsLoading(false);
-      }, 2000);
-    } catch (error) {
-      console.error("Blockchain retry failed:", error);
-      setEvents(mockEvents);
-      setFilteredEvents(mockEvents);
-      setIsLoading(false);
-    }
-  };
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array - only run once!
 
   // Filter events whenever filter criteria changes
   useEffect(() => {
@@ -205,11 +239,8 @@ const EventsPage: React.FC = () => {
     if (dateFilter) params.set("date", dateFilter);
     if (statusFilter) params.set("status", statusFilter);
 
-    const newParams = params.toString();
-    const currentParams = searchParams.toString();
-    
-    if (newParams !== currentParams) {
-      setSearchParams(params, { replace: true });
+    if (params.toString() !== searchParams.toString()) {
+      setSearchParams(params);
     }
   }, [
     searchQuery,
@@ -221,13 +252,13 @@ const EventsPage: React.FC = () => {
     searchParams,
   ]);
 
-  // Extract unique values for filters from current events
+  // Extract unique values for filters
   const categories = Array.from(
-    new Set(events.map((event) => event.category))
+    new Set(filteredEvents.map((event) => event.category))
   );
 
   const locations = Array.from(
-    new Set(events.map((event) => event.location))
+    new Set(filteredEvents.map((event) => event.location))
   );
 
   const statuses = ["available", "limited", "soldout"];
@@ -242,24 +273,12 @@ const EventsPage: React.FC = () => {
           </Text>
         </Box>
 
-        {/* Show info about data source */}
-        {!useBlockchain && hasTriedBlockchain && (
-          <Alert status="info" borderRadius="md">
+        {/* Display status message */}
+        {errorMsg && (
+          <Alert status={usingMockData ? "info" : "warning"} borderRadius="md">
             <AlertIcon />
-            <Box flex="1">
-              <AlertTitle>Using Demo Data</AlertTitle>
-              <AlertDescription>
-                Blockchain connection not available. Showing sample events for demonstration.
-              </AlertDescription>
-            </Box>
-            <Button
-              colorScheme="blue"
-              size="sm"
-              onClick={handleRetryBlockchain}
-              ml={3}
-            >
-              Try Blockchain
-            </Button>
+            <AlertTitle>{usingMockData ? "Demo Mode" : "Notice"}:</AlertTitle>
+            <AlertDescription>{errorMsg}</AlertDescription>
           </Alert>
         )}
 
