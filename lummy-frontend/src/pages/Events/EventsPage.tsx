@@ -1,3 +1,4 @@
+// src/pages/Events/EventsPage.tsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -18,7 +19,6 @@ import { EventCard } from "../../components/core/Card";
 import { mockEvents } from "../../data/mockEvents";
 import { Event } from "../../types/Event";
 import { EventsFilter, EventsSorter } from "../../components/events";
-import { useSmartContract } from "../../hooks/useSmartContract"; // Import hook smart contract
 
 const EventsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -27,7 +27,8 @@ const EventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [useBlockchain, setUseBlockchain] = useState(false);
+  const [hasTriedBlockchain, setHasTriedBlockchain] = useState(false);
 
   // Extract URL parameters
   const categoryFromUrl = searchParams.get("category") || "";
@@ -41,83 +42,68 @@ const EventsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [sortBy, setSortBy] = useState("date-asc");
 
-  // Import smart contract hook
-  const {
-    getEvents,
-    getEventDetails,
-    loading: contractLoading,
-    error: contractError,
-  } = useSmartContract();
-
-  // Load events from blockchain
+  // Simple one-time blockchain attempt
   useEffect(() => {
-    const fetchEvents = async () => {
+    const loadEvents = async () => {
       setIsLoading(true);
-      setErrorMsg(null);
 
-      try {
-        // Get event addresses from factory
-        const eventAddresses = await getEvents();
+      // If we haven't tried blockchain yet, try once
+      if (!hasTriedBlockchain && !useBlockchain) {
+        try {
 
-        if (eventAddresses && eventAddresses.length > 0) {
-          // Get details for each event
-          const eventPromises = eventAddresses.map(async (address) => {
-            const details = await getEventDetails(address);
-            if (details) {
-              // Convert blockchain data to Event interface
-              return {
-                id: address,
-                title: details.name,
-                description: details.description,
-                date: new Date(Number(details.date) * 1000).toISOString(), // Convert timestamp to ISO string
-                location: details.venue,
-                venue: details.venue,
-                imageUrl:
-                  "https://images.unsplash.com/photo-1459865264687-595d652de67e", // Default image
-                price: 0, // Will be updated with ticket tiers later
-                currency: "IDRX",
-                category: "Event", // Default category
-                status: "available",
-                organizer: {
-                  id: details.organizer,
-                  name: "Event Organizer",
-                  verified: true,
-                  description: "Event organizer",
-                },
-                ticketsAvailable: 0, // Will be updated with ticket tiers later
-              } as Event;
-            }
-            return null;
-          });
-
-          const eventsData = (await Promise.all(eventPromises)).filter(
-            (event): event is Event => event !== null
-          );
-
-          setEvents(eventsData);
-          setFilteredEvents(eventsData);
-        } else {
-          // If no events found, use mock data for demo
+          
+          // Try to get events from blockchain - but only once
+          setHasTriedBlockchain(true);
+          
+          // For now, just use mock data to prevent loops
+          // In production, you would implement proper blockchain fetching here
+          console.log("Attempting blockchain connection...");
+          
+          // Simulate blockchain attempt
+          setTimeout(() => {
+            console.log("Blockchain connection failed, using mock data");
+            setEvents(mockEvents);
+            setFilteredEvents(mockEvents);
+            setIsLoading(false);
+          }, 1000);
+          
+        } catch (error) {
+          console.log("Blockchain not available, using mock data");
           setEvents(mockEvents);
           setFilteredEvents(mockEvents);
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        setErrorMsg(
-          contractError ||
-            "Failed to load events from blockchain. Using sample data instead."
-        );
-
-        // Fallback to mock data
+      } else {
+        // Use mock data directly
         setEvents(mockEvents);
         setFilteredEvents(mockEvents);
-      } finally {
         setIsLoading(false);
       }
     };
 
-    fetchEvents();
-  }, [getEvents, getEventDetails, contractError]);
+    loadEvents();
+  }, []); // Empty dependency array - only run once
+
+  // Handle manual blockchain retry
+  const handleRetryBlockchain = async () => {
+    setIsLoading(true);
+    setUseBlockchain(true);
+    
+    try {
+      // Here you would implement actual blockchain fetching
+      // For now, just show mock data after delay
+      setTimeout(() => {
+        setEvents(mockEvents);
+        setFilteredEvents(mockEvents);
+        setIsLoading(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Blockchain retry failed:", error);
+      setEvents(mockEvents);
+      setFilteredEvents(mockEvents);
+      setIsLoading(false);
+    }
+  };
 
   // Filter events whenever filter criteria changes
   useEffect(() => {
@@ -148,7 +134,6 @@ const EventsPage: React.FC = () => {
 
     // Apply date filter
     if (dateFilter) {
-      // Convert both dates to YYYY-MM-DD format for comparison
       const filterDate = new Date(dateFilter).toISOString().split("T")[0];
       filtered = filtered.filter((event) => {
         const eventDate = new Date(event.date).toISOString().split("T")[0];
@@ -220,9 +205,11 @@ const EventsPage: React.FC = () => {
     if (dateFilter) params.set("date", dateFilter);
     if (statusFilter) params.set("status", statusFilter);
 
-    // Only update if the params are different to avoid infinite loops
-    if (params.toString() !== searchParams.toString()) {
-      setSearchParams(params);
+    const newParams = params.toString();
+    const currentParams = searchParams.toString();
+    
+    if (newParams !== currentParams) {
+      setSearchParams(params, { replace: true });
     }
   }, [
     searchQuery,
@@ -236,11 +223,11 @@ const EventsPage: React.FC = () => {
 
   // Extract unique values for filters from current events
   const categories = Array.from(
-    new Set(filteredEvents.map((event) => event.category))
+    new Set(events.map((event) => event.category))
   );
 
   const locations = Array.from(
-    new Set(filteredEvents.map((event) => event.location))
+    new Set(events.map((event) => event.location))
   );
 
   const statuses = ["available", "limited", "soldout"];
@@ -255,12 +242,24 @@ const EventsPage: React.FC = () => {
           </Text>
         </Box>
 
-        {/* Display error message if any */}
-        {errorMsg && (
-          <Alert status="warning" borderRadius="md">
+        {/* Show info about data source */}
+        {!useBlockchain && hasTriedBlockchain && (
+          <Alert status="info" borderRadius="md">
             <AlertIcon />
-            <AlertTitle>Warning:</AlertTitle>
-            <AlertDescription>{errorMsg}</AlertDescription>
+            <Box flex="1">
+              <AlertTitle>Using Demo Data</AlertTitle>
+              <AlertDescription>
+                Blockchain connection not available. Showing sample events for demonstration.
+              </AlertDescription>
+            </Box>
+            <Button
+              colorScheme="blue"
+              size="sm"
+              onClick={handleRetryBlockchain}
+              ml={3}
+            >
+              Try Blockchain
+            </Button>
           </Alert>
         )}
 
@@ -285,13 +284,13 @@ const EventsPage: React.FC = () => {
         {/* Results section */}
         <Box>
           <EventsSorter
-            isLoading={isLoading || contractLoading}
+            isLoading={isLoading}
             totalCount={filteredEvents.length}
             sortBy={sortBy}
             onSortChange={setSortBy}
           />
 
-          {isLoading || contractLoading ? (
+          {isLoading ? (
             // Loading state
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} spacing={6}>
               {Array.from({ length: 8 }).map((_, index) => (

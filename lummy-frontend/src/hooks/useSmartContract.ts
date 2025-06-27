@@ -6,7 +6,6 @@ import {
   EVENT_FACTORY_ABI,
 } from "../contracts/EventFactory";
 import { EVENT_ABI } from "../contracts/Event";
-import { TICKET_NFT_ABI } from "../contracts/TicketNFT";
 
 /**
  * Interface for Event data returned from contracts
@@ -33,11 +32,8 @@ export interface TicketTierData {
 }
 
 /**
- * Custom hook for interacting with smart contracts.
- * Provides functions for:
- * - Creating and managing events
- * - Handling ticket tiers
- * - Processing ticket purchases and transfers
+ * Simplified custom hook for interacting with smart contracts.
+ * Removes automatic retries and infinite loops.
  */
 export const useSmartContract = () => {
   const { address } = useAccount();
@@ -46,14 +42,11 @@ export const useSmartContract = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Clear error when starting new operation
+  const clearError = () => setError(null);
+
   /**
-   * Creates a new event on the blockchain
-   * @param name Event name
-   * @param description Event description
-   * @param date Event date
-   * @param venue Event venue
-   * @param ipfsMetadata Additional metadata in IPFS
-   * @returns Event contract address if successful, null otherwise
+   * Creates a new event on the blockchain - single attempt only
    */
   const createEvent = useCallback(
     async (
@@ -64,18 +57,17 @@ export const useSmartContract = () => {
       ipfsMetadata: string = ""
     ) => {
       if (!walletClient || !address || !publicClient) {
-        setError("Wallet not connected or provider not available");
+        const errorMsg = "Wallet not connected or provider not available";
+        setError(errorMsg);
         return null;
       }
 
       setLoading(true);
-      setError(null);
+      clearError();
 
       try {
-        // Convert date to unix timestamp in seconds
         const dateTimestamp = Math.floor(date.getTime() / 1000);
 
-        // Prepare transaction
         const hash = await walletClient.writeContract({
           address: EVENT_FACTORY_ADDRESS as `0x${string}`,
           abi: EVENT_FACTORY_ABI,
@@ -83,23 +75,14 @@ export const useSmartContract = () => {
           args: [name, description, BigInt(dateTimestamp), venue, ipfsMetadata],
         });
 
-        // Wait for receipt
         const receipt = await publicClient.waitForTransactionReceipt({ hash });
-
-        // Find EventCreated event from receipt
         const logs = receipt.logs;
 
-        // Manually find EventCreated event
         for (const log of logs) {
-          // EventCreated has signature 'EventCreated(uint256,address)'
-          // topic[0] is the event signature hash
           if (
             log.topics[0] ===
             "0x7a74ea23c916c344aa7bb079fa7db0cdb4964ade3d70c7f1c8694f9efa0b8abe"
           ) {
-            // Decode eventId and eventContract from log
-            // topics[1] is eventId (indexed)
-            // topics[2] is eventContract (indexed)
             const eventAddress =
               (`0x${log.topics[2]?.slice(26)}` as `0x${string}`) || "";
             return eventAddress;
@@ -109,7 +92,8 @@ export const useSmartContract = () => {
         return null;
       } catch (err) {
         console.error("Error creating event:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
+        const errorMsg = err instanceof Error ? err.message : "Unknown error occurred";
+        setError(errorMsg);
         return null;
       } finally {
         setLoading(false);
@@ -119,17 +103,17 @@ export const useSmartContract = () => {
   );
 
   /**
-   * Retrieves all events from the factory contract
-   * @returns Array of event contract addresses
+   * Retrieves all events from the factory contract - single attempt only
    */
   const getEvents = useCallback(async () => {
     if (!publicClient) {
-      setError("Provider not available");
+      const errorMsg = "Provider not available";
+      setError(errorMsg);
       return [];
     }
 
     setLoading(true);
-    setError(null);
+    clearError();
 
     try {
       const events = (await publicClient.readContract({
@@ -141,7 +125,8 @@ export const useSmartContract = () => {
       return events;
     } catch (err) {
       console.error("Error getting events:", err);
-      setError(err instanceof Error ? err.message : "Unknown error occurred");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error occurred";
+      setError(errorMsg);
       return [];
     } finally {
       setLoading(false);
@@ -149,19 +134,18 @@ export const useSmartContract = () => {
   }, [publicClient]);
 
   /**
-   * Gets the details of a specific event
-   * @param eventAddress Contract address of the event
-   * @returns Event details or null if error
+   * Gets the details of a specific event - single attempt only
    */
   const getEventDetails = useCallback(
     async (eventAddress: string) => {
       if (!publicClient) {
-        setError("Provider not available");
+        const errorMsg = "Provider not available";
+        setError(errorMsg);
         return null;
       }
 
       setLoading(true);
-      setError(null);
+      clearError();
 
       try {
         const details = (await publicClient.readContract({
@@ -174,7 +158,8 @@ export const useSmartContract = () => {
         return details;
       } catch (err) {
         console.error("Error getting event details:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
+        const errorMsg = err instanceof Error ? err.message : "Unknown error occurred";
+        setError(errorMsg);
         return null;
       } finally {
         setLoading(false);
@@ -184,29 +169,26 @@ export const useSmartContract = () => {
   );
 
   /**
-   * Gets all ticket tiers for an event
-   * @param eventAddress Contract address of the event
-   * @returns Array of ticket tiers
+   * Gets all ticket tiers for an event - single attempt only
    */
   const getTicketTiers = useCallback(
     async (eventAddress: string) => {
       if (!publicClient) {
-        setError("Provider not available");
+        const errorMsg = "Provider not available";
+        setError(errorMsg);
         return [];
       }
 
       setLoading(true);
-      setError(null);
+      clearError();
 
       try {
-        // Get tier count
         const tierCount = (await publicClient.readContract({
           address: eventAddress as `0x${string}`,
           abi: EVENT_ABI,
           functionName: "tierCount",
         })) as bigint;
 
-        // Get tier details for each tier
         const tiers: TicketTierData[] = [];
         for (let i = 0; i < Number(tierCount); i++) {
           const tier = (await publicClient.readContract({
@@ -228,7 +210,8 @@ export const useSmartContract = () => {
         return tiers;
       } catch (err) {
         console.error("Error getting ticket tiers:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
+        const errorMsg = err instanceof Error ? err.message : "Unknown error occurred";
+        setError(errorMsg);
         return [];
       } finally {
         setLoading(false);
@@ -238,13 +221,7 @@ export const useSmartContract = () => {
   );
 
   /**
-   * Adds a new ticket tier to an event
-   * @param eventAddress Contract address of the event
-   * @param name Tier name
-   * @param price Ticket price
-   * @param available Number of available tickets
-   * @param maxPerPurchase Maximum tickets per purchase
-   * @returns Success status
+   * Adds a new ticket tier to an event - single attempt only
    */
   const addTicketTier = useCallback(
     async (
@@ -255,15 +232,15 @@ export const useSmartContract = () => {
       maxPerPurchase: number
     ) => {
       if (!walletClient || !address || !publicClient) {
-        setError("Wallet not connected or provider not available");
+        const errorMsg = "Wallet not connected or provider not available";
+        setError(errorMsg);
         return false;
       }
 
       setLoading(true);
-      setError(null);
+      clearError();
 
       try {
-        // Prepare and send the transaction
         const hash = await walletClient.writeContract({
           address: eventAddress as `0x${string}`,
           abi: EVENT_ABI,
@@ -276,12 +253,12 @@ export const useSmartContract = () => {
           ],
         });
 
-        // Wait for receipt
         await publicClient.waitForTransactionReceipt({ hash });
         return true;
       } catch (err) {
         console.error("Error adding ticket tier:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
+        const errorMsg = err instanceof Error ? err.message : "Unknown error occurred";
+        setError(errorMsg);
         return false;
       } finally {
         setLoading(false);
@@ -291,214 +268,13 @@ export const useSmartContract = () => {
   );
 
   /**
-   * Purchases tickets for an event
-   * @param eventAddress Contract address of the event
-   * @param tierId Ticket tier ID
-   * @param quantity Number of tickets to purchase
-   * @returns Success status
+   * Manual retry function - users can call this explicitly
    */
-  const purchaseTicket = useCallback(
-    async (eventAddress: string, tierId: number, quantity: number) => {
-      if (!walletClient || !address || !publicClient) {
-        setError("Wallet not connected or provider not available");
-        return false;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        // First approve IDRX token spending
-        // Note: You'll need to implement IDRX token approval first
-
-        // Then purchase ticket
-        const hash = await walletClient.writeContract({
-          address: eventAddress as `0x${string}`,
-          abi: EVENT_ABI,
-          functionName: "purchaseTicket",
-          args: [BigInt(tierId), BigInt(quantity)],
-        });
-
-        // Wait for receipt
-        await publicClient.waitForTransactionReceipt({ hash });
-        return true;
-      } catch (err) {
-        console.error("Error purchasing ticket:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
-        return false;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [walletClient, address, publicClient]
-  );
-
-  /**
-   * Gets the NFT contract address for an event's tickets
-   * @param eventAddress Contract address of the event
-   * @returns NFT contract address or null if error
-   */
-  const getTicketNFTAddress = useCallback(
-    async (eventAddress: string) => {
-      if (!publicClient) {
-        setError("Provider not available");
-        return null;
-      }
-
-      try {
-        const nftAddress = (await publicClient.readContract({
-          address: eventAddress as `0x${string}`,
-          abi: EVENT_ABI,
-          functionName: "getTicketNFT",
-        })) as `0x${string}`;
-
-        return nftAddress;
-      } catch (err) {
-        console.error("Error getting ticket NFT address:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
-        return null;
-      }
-    },
-    [publicClient]
-  );
-
-  /**
-   * Transfers a ticket to another address
-   * @param ticketNFTAddress NFT contract address
-   * @param tokenId Token ID of the ticket
-   * @param toAddress Recipient address
-   * @returns Success status
-   */
-  const transferTicket = useCallback(
-    async (ticketNFTAddress: string, tokenId: number, toAddress: string) => {
-      if (!walletClient || !address || !publicClient) {
-        setError("Wallet not connected or provider not available");
-        return false;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const hash = await walletClient.writeContract({
-          address: ticketNFTAddress as `0x${string}`,
-          abi: TICKET_NFT_ABI,
-          functionName: "transferTicket",
-          args: [toAddress as `0x${string}`, BigInt(tokenId)],
-        });
-
-        // Wait for receipt
-        await publicClient.waitForTransactionReceipt({ hash });
-        return true;
-      } catch (err) {
-        console.error("Error transferring ticket:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
-        return false;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [walletClient, address, publicClient]
-  );
-
-  /**
-   * Lists a ticket for resale on the marketplace
-   * @param eventAddress Contract address of the event
-   * @param tokenId Token ID of the ticket
-   * @param price Resale price
-   * @returns Success status
-   */
-  const listTicketForResale = useCallback(
-    async (eventAddress: string, tokenId: number, price: number) => {
-      if (!walletClient || !address || !publicClient) {
-        setError("Wallet not connected or provider not available");
-        return false;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        // First need to approve the NFT transfer to the event contract
-        // Get the NFT address
-        const nftAddress = await getTicketNFTAddress(eventAddress);
-        if (!nftAddress) {
-          throw new Error("Could not get ticket NFT address");
-        }
-
-        // Approve
-        const approveHash = await walletClient.writeContract({
-          address: nftAddress,
-          abi: TICKET_NFT_ABI,
-          functionName: "approve",
-          args: [eventAddress as `0x${string}`, BigInt(tokenId)],
-        });
-
-        await publicClient.waitForTransactionReceipt({ hash: approveHash });
-
-        // Now list for resale
-        const hash = await walletClient.writeContract({
-          address: eventAddress as `0x${string}`,
-          abi: EVENT_ABI,
-          functionName: "listTicketForResale",
-          args: [BigInt(tokenId), BigInt(price)],
-        });
-
-        // Wait for receipt
-        await publicClient.waitForTransactionReceipt({ hash });
-        return true;
-      } catch (err) {
-        console.error("Error listing ticket for resale:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
-        return false;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [walletClient, address, publicClient, getTicketNFTAddress]
-  );
-
-  /**
-   * Purchases a resale ticket from the marketplace
-   * @param eventAddress Contract address of the event
-   * @param tokenId Token ID of the ticket
-   * @returns Success status
-   */
-  const purchaseResaleTicket = useCallback(
-    async (eventAddress: string, tokenId: number) => {
-      if (!walletClient || !address || !publicClient) {
-        setError("Wallet not connected or provider not available");
-        return false;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        // First approve IDRX token spending
-        // Note: You'll need to implement IDRX token approval first
-
-        // Then purchase resale ticket
-        const hash = await walletClient.writeContract({
-          address: eventAddress as `0x${string}`,
-          abi: EVENT_ABI,
-          functionName: "purchaseResaleTicket",
-          args: [BigInt(tokenId)],
-        });
-
-        // Wait for receipt
-        await publicClient.waitForTransactionReceipt({ hash });
-        return true;
-      } catch (err) {
-        console.error("Error purchasing resale ticket:", err);
-        setError(err instanceof Error ? err.message : "Unknown error occurred");
-        return false;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [walletClient, address, publicClient]
-  );
+  const retryLastOperation = useCallback(() => {
+    clearError();
+    // This would need to be implemented based on what operation failed
+    console.log("Retry functionality - implement based on last failed operation");
+  }, []);
 
   return {
     createEvent,
@@ -506,12 +282,9 @@ export const useSmartContract = () => {
     getEventDetails,
     getTicketTiers,
     addTicketTier,
-    purchaseTicket,
-    getTicketNFTAddress,
-    transferTicket,
-    listTicketForResale,
-    purchaseResaleTicket,
+    retryLastOperation,
     loading,
     error,
+    clearError,
   };
 };
