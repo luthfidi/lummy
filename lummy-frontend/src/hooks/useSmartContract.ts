@@ -6,7 +6,6 @@ import {
   EVENT_FACTORY_ABI,
 } from "../contracts/EventFactory";
 import { EVENT_ABI } from "../contracts/Event";
-import { TICKET_NFT_ABI } from "../contracts/TicketNFT";
 
 /**
  * Interface for Event data returned from contracts
