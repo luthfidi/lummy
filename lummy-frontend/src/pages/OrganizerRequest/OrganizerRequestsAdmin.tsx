@@ -28,7 +28,6 @@ import {
   ModalBody,
   ModalCloseButton,
   SimpleGrid,
-  Divider,
   useToast,
   Textarea,
   IconButton,
@@ -46,7 +45,7 @@ interface OrganizerRequest {
   organizerType: string;
   eventCategories: string[];
   experience: string;
-  status: "submitted" | "under_review" | "need_more_info" | "approved" | "rejected";
+  status: "under_review" | "need_more_info" | "approved" | "rejected";
   submittedDate: string;
   description: string;
   estimatedBudget: string;
@@ -69,9 +68,10 @@ const mockRequests: OrganizerRequest[] = [
     organizerType: "PT",
     eventCategories: ["Music", "Art"],
     experience: "3-5 years",
-    status: "submitted",
+    status: "under_review",
     submittedDate: "2025-01-10T09:30:00",
-    description: "We are a music production company specializing in live concerts and music festivals in Jakarta area.",
+    description:
+      "We are a music production company specializing in live concerts and music festivals in Jakarta area.",
     estimatedBudget: "100M - 500M",
     estimatedEventsPerYear: "6-12",
     bankName: "Bank BCA",
@@ -91,7 +91,8 @@ const mockRequests: OrganizerRequest[] = [
     experience: "5+ years",
     status: "under_review",
     submittedDate: "2025-01-08T14:20:00",
-    description: "Leading technology event organizer focused on startup and innovation conferences.",
+    description:
+      "Leading technology event organizer focused on startup and innovation conferences.",
     estimatedBudget: "50M - 100M",
     estimatedEventsPerYear: "13-24",
     bankName: "Bank Mandiri",
@@ -109,7 +110,8 @@ const mockRequests: OrganizerRequest[] = [
     experience: "1-3 years",
     status: "need_more_info",
     submittedDate: "2025-01-05T11:45:00",
-    description: "Individual organizer specializing in creative workshops and educational seminars.",
+    description:
+      "Individual organizer specializing in creative workshops and educational seminars.",
     estimatedBudget: "< 10M",
     estimatedEventsPerYear: "1-5",
     bankName: "Bank BNI",
@@ -121,10 +123,12 @@ const mockRequests: OrganizerRequest[] = [
 
 const OrganizerRequestsAdmin: React.FC = () => {
   const [requests, setRequests] = useState<OrganizerRequest[]>(mockRequests);
-  const [filteredRequests, setFilteredRequests] = useState<OrganizerRequest[]>(mockRequests);
+  const [filteredRequests, setFilteredRequests] =
+    useState<OrganizerRequest[]>(mockRequests);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedRequest, setSelectedRequest] = useState<OrganizerRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<OrganizerRequest | null>(null);
   const [reviewNote, setReviewNote] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
@@ -136,16 +140,17 @@ const OrganizerRequestsAdmin: React.FC = () => {
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(req =>
-        req.fullName.toLowerCase().includes(query) ||
-        req.email.toLowerCase().includes(query) ||
-        req.organizerType.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (req) =>
+          req.fullName.toLowerCase().includes(query) ||
+          req.email.toLowerCase().includes(query) ||
+          req.organizerType.toLowerCase().includes(query)
       );
     }
 
     // Apply status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(req => req.status === statusFilter);
+      filtered = filtered.filter((req) => req.status === statusFilter);
     }
 
     setFilteredRequests(filtered);
@@ -153,23 +158,31 @@ const OrganizerRequestsAdmin: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "submitted": return "blue";
-      case "under_review": return "orange";
-      case "need_more_info": return "yellow";
-      case "approved": return "green";
-      case "rejected": return "red";
-      default: return "gray";
+      case "under_review":
+        return "orange";
+      case "need_more_info":
+        return "yellow";
+      case "approved":
+        return "green";
+      case "rejected":
+        return "red";
+      default:
+        return "gray";
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "submitted": return "Submitted";
-      case "under_review": return "Under Review";
-      case "need_more_info": return "Need More Info";
-      case "approved": return "Approved";
-      case "rejected": return "Rejected";
-      default: return status;
+      case "under_review":
+        return "Under Review";
+      case "need_more_info":
+        return "Need More Info";
+      case "approved":
+        return "Approved";
+      case "rejected":
+        return "Rejected";
+      default:
+        return status;
     }
   };
 
@@ -182,11 +195,13 @@ const OrganizerRequestsAdmin: React.FC = () => {
   const handleStatusUpdate = (newStatus: string) => {
     if (!selectedRequest) return;
 
-    setRequests(prev => prev.map(req =>
-      req.id === selectedRequest.id
-        ? { ...req, status: newStatus as any }
-        : req
-    ));
+    setRequests((prev) =>
+      prev.map((req) =>
+        req.id === selectedRequest.id
+          ? { ...req, status: newStatus as any }
+          : req
+      )
+    );
 
     toast({
       title: "Status Updated",
@@ -239,30 +254,14 @@ const OrganizerRequestsAdmin: React.FC = () => {
         <Flex justify="space-between" align="center">
           <Box>
             <Heading size="lg">Organizer Requests</Heading>
-            <Text color="gray.600">Review and manage organizer applications</Text>
+            <Text color="gray.600">
+              Review and manage organizer applications
+            </Text>
           </Box>
           <Badge colorScheme="purple" p={2} borderRadius="md" fontSize="md">
             {filteredRequests.length} Requests
           </Badge>
         </Flex>
-
-        {/* Statistics */}
-        <SimpleGrid columns={{ base: 2, md: 5 }} spacing={4}>
-          {[
-            { label: "Total", count: requests.length, color: "gray" },
-            { label: "Submitted", count: requests.filter(r => r.status === "submitted").length, color: "blue" },
-            { label: "Under Review", count: requests.filter(r => r.status === "under_review").length, color: "orange" },
-            { label: "Approved", count: requests.filter(r => r.status === "approved").length, color: "green" },
-            { label: "Rejected", count: requests.filter(r => r.status === "rejected").length, color: "red" },
-          ].map((stat) => (
-            <Box key={stat.label} p={4} bg="white" borderRadius="lg" borderWidth="1px">
-              <Text fontSize="2xl" fontWeight="bold" color={`${stat.color}.500`}>
-                {stat.count}
-              </Text>
-              <Text fontSize="sm" color="gray.600">{stat.label}</Text>
-            </Box>
-          ))}
-        </SimpleGrid>
 
         {/* Filters */}
         <Flex gap={4} direction={{ base: "column", md: "row" }}>
@@ -283,7 +282,6 @@ const OrganizerRequestsAdmin: React.FC = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="all">All Status</option>
-            <option value="submitted">Submitted</option>
             <option value="under_review">Under Review</option>
             <option value="need_more_info">Need More Info</option>
             <option value="approved">Approved</option>
@@ -312,7 +310,9 @@ const OrganizerRequestsAdmin: React.FC = () => {
                     <Td>
                       <VStack align="start" spacing={1}>
                         <Text fontWeight="medium">{request.fullName}</Text>
-                        <Text fontSize="sm" color="gray.500">{request.email}</Text>
+                        <Text fontSize="sm" color="gray.500">
+                          {request.email}
+                        </Text>
                       </VStack>
                     </Td>
                     <Td>
@@ -322,8 +322,13 @@ const OrganizerRequestsAdmin: React.FC = () => {
                     </Td>
                     <Td>
                       <VStack align="start" spacing={1}>
-                        {request.eventCategories.slice(0, 2).map(cat => (
-                          <Badge key={cat} colorScheme="purple" variant="outline" size="sm">
+                        {request.eventCategories.slice(0, 2).map((cat) => (
+                          <Badge
+                            key={cat}
+                            colorScheme="purple"
+                            variant="outline"
+                            size="sm"
+                          >
                             {cat}
                           </Badge>
                         ))}
@@ -341,7 +346,9 @@ const OrganizerRequestsAdmin: React.FC = () => {
                       </Badge>
                     </Td>
                     <Td>
-                      <Text fontSize="sm">{formatDate(request.submittedDate)}</Text>
+                      <Text fontSize="sm">
+                        {formatDate(request.submittedDate)}
+                      </Text>
                     </Td>
                     <Td>
                       <IconButton
@@ -368,186 +375,237 @@ const OrganizerRequestsAdmin: React.FC = () => {
 
       {/* Detail Modal */}
       {selectedRequest && (
-        <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <Modal isOpen={isOpen} onClose={onClose} size="6xl">
           <ModalOverlay />
-          <ModalContent>
+          <ModalContent maxH="90vh" overflowY="auto">
             <ModalHeader>
-              <VStack align="start" spacing={1}>
+              <HStack align="center" spacing={3}>
                 <Text>{selectedRequest.fullName}</Text>
                 <Badge colorScheme={getStatusColor(selectedRequest.status)}>
                   {getStatusLabel(selectedRequest.status)}
                 </Badge>
-              </VStack>
+              </HStack>
             </ModalHeader>
             <ModalCloseButton />
 
             <ModalBody>
-              <VStack spacing={6} align="stretch">
-                {/* Basic Information */}
-                <Box>
-                  <Heading size="sm" mb={3}>Basic Information</Heading>
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Email</Text>
-                      <Text fontWeight="medium">{selectedRequest.email}</Text>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Phone</Text>
-                      <Text fontWeight="medium">{selectedRequest.phone}</Text>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Type</Text>
-                      <Badge colorScheme="blue">{selectedRequest.organizerType}</Badge>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Experience</Text>
-                      <Text fontWeight="medium">{selectedRequest.experience}</Text>
-                    </Box>
-                  </SimpleGrid>
+              <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={8}>
+                {/* Left Column */}
+                <VStack spacing={6} align="stretch">
+                  {/* Basic Information */}
+                  <Box>
+                    <Heading size="sm" mb={3}>
+                      Basic Information
+                    </Heading>
+                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Email
+                        </Text>
+                        <Text fontWeight="medium">{selectedRequest.email}</Text>
+                      </Box>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Phone
+                        </Text>
+                        <Text fontWeight="medium">{selectedRequest.phone}</Text>
+                      </Box>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Type
+                        </Text>
+                        <Badge colorScheme="blue">
+                          {selectedRequest.organizerType}
+                        </Badge>
+                      </Box>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Experience
+                        </Text>
+                        <Text fontWeight="medium">
+                          {selectedRequest.experience}
+                        </Text>
+                      </Box>
+                    </SimpleGrid>
 
-                  <Box mt={4}>
-                    <Text fontSize="sm" color="gray.600">Address</Text>
-                    <Text fontWeight="medium">{selectedRequest.address}</Text>
+                    <Box mt={4}>
+                      <Text fontSize="sm" color="gray.600">
+                        Address
+                      </Text>
+                      <Text fontWeight="medium">{selectedRequest.address}</Text>
+                    </Box>
+
+                    {selectedRequest.website && (
+                      <Box mt={4}>
+                        <Text fontSize="sm" color="gray.600">
+                          Website
+                        </Text>
+                        <Text fontWeight="medium" color="purple.500">
+                          {selectedRequest.website}
+                        </Text>
+                      </Box>
+                    )}
                   </Box>
 
-                  {selectedRequest.website && (
-                    <Box mt={4}>
-                      <Text fontSize="sm" color="gray.600">Website</Text>
-                      <Text fontWeight="medium" color="purple.500">
-                        {selectedRequest.website}
-                      </Text>
-                    </Box>
-                  )}
-                </Box>
+                  {/* Business Information */}
+                  <Box>
+                    <Heading size="sm" mb={3}>
+                      Business Information
+                    </Heading>
+                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Event Categories
+                        </Text>
+                        <HStack spacing={1} wrap="wrap">
+                          {selectedRequest.eventCategories.map((cat) => (
+                            <Badge
+                              key={cat}
+                              colorScheme="purple"
+                              variant="outline"
+                            >
+                              {cat}
+                            </Badge>
+                          ))}
+                        </HStack>
+                      </Box>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Events per Year
+                        </Text>
+                        <Text fontWeight="medium">
+                          {selectedRequest.estimatedEventsPerYear}
+                        </Text>
+                      </Box>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Budget Range
+                        </Text>
+                        <Text fontWeight="medium">
+                          {selectedRequest.estimatedBudget}
+                        </Text>
+                      </Box>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Submitted
+                        </Text>
+                        <Text fontWeight="medium">
+                          {formatDate(selectedRequest.submittedDate)}
+                        </Text>
+                      </Box>
+                    </SimpleGrid>
+                  </Box>
 
-                <Divider />
+                  {/* Financial Information */}
+                  <Box>
+                    <Heading size="sm" mb={3}>
+                      Financial Information
+                    </Heading>
+                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Bank
+                        </Text>
+                        <Text fontWeight="medium">
+                          {selectedRequest.bankName}
+                        </Text>
+                      </Box>
+                      <Box>
+                        <Text fontSize="sm" color="gray.600">
+                          Account Number
+                        </Text>
+                        <Text fontWeight="medium" fontFamily="monospace">
+                          {selectedRequest.accountNumber}
+                        </Text>
+                      </Box>
+                      <Box gridColumn={{ base: 1, md: "1 / 3" }}>
+                        <Text fontSize="sm" color="gray.600">
+                          Account Holder
+                        </Text>
+                        <Text fontWeight="medium">
+                          {selectedRequest.accountHolder}
+                        </Text>
+                      </Box>
+                    </SimpleGrid>
+                  </Box>
+                </VStack>
 
-                {/* Business Information */}
-                <Box>
-                  <Heading size="sm" mb={3}>Business Information</Heading>
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Event Categories</Text>
-                      <HStack spacing={1} wrap="wrap">
-                        {selectedRequest.eventCategories.map(cat => (
-                          <Badge key={cat} colorScheme="purple" variant="outline">
-                            {cat}
-                          </Badge>
-                        ))}
-                      </HStack>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Events per Year</Text>
-                      <Text fontWeight="medium">{selectedRequest.estimatedEventsPerYear}</Text>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Budget Range</Text>
-                      <Text fontWeight="medium">{selectedRequest.estimatedBudget}</Text>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Submitted</Text>
-                      <Text fontWeight="medium">{formatDate(selectedRequest.submittedDate)}</Text>
-                    </Box>
-                  </SimpleGrid>
-                </Box>
+                {/* Right Column */}
+                <VStack spacing={6} align="stretch">
+                  {/* Description */}
+                  <Box>
+                    <Heading size="sm" mb={3}>
+                      About
+                    </Heading>
+                    <Text>{selectedRequest.description}</Text>
+                  </Box>
 
-                <Divider />
-
-                {/* Description */}
-                <Box>
-                  <Heading size="sm" mb={3}>About</Heading>
-                  <Text>{selectedRequest.description}</Text>
-                </Box>
-
-                {selectedRequest.previousEvents && (
-                  <>
-                    <Divider />
+                  {selectedRequest.previousEvents && (
                     <Box>
-                      <Heading size="sm" mb={3}>Previous Events</Heading>
+                      <Heading size="sm" mb={3}>
+                        Previous Events
+                      </Heading>
                       <Text>{selectedRequest.previousEvents}</Text>
                     </Box>
-                  </>
-                )}
+                  )}
 
-                {selectedRequest.references && (
-                  <>
-                    <Divider />
+                  {selectedRequest.references && (
                     <Box>
-                      <Heading size="sm" mb={3}>References</Heading>
+                      <Heading size="sm" mb={3}>
+                        References
+                      </Heading>
                       <Text>{selectedRequest.references}</Text>
                     </Box>
-                  </>
-                )}
+                  )}
 
-                <Divider />
+                  {/* Admin Actions */}
+                  <Box>
+                    <Heading size="sm" mb={3}>
+                      Admin Actions
+                    </Heading>
 
-                {/* Financial Information */}
-                <Box>
-                  <Heading size="sm" mb={3}>Financial Information</Heading>
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Bank</Text>
-                      <Text fontWeight="medium">{selectedRequest.bankName}</Text>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Account Number</Text>
-                      <Text fontWeight="medium" fontFamily="monospace">
-                        {selectedRequest.accountNumber}
-                      </Text>
-                    </Box>
-                    <Box gridColumn={{ base: 1, md: "1 / 3" }}>
-                      <Text fontSize="sm" color="gray.600">Account Holder</Text>
-                      <Text fontWeight="medium">{selectedRequest.accountHolder}</Text>
-                    </Box>
-                  </SimpleGrid>
-                </Box>
+                    <VStack spacing={3} align="stretch">
+                      <Textarea
+                        placeholder="Add a note or message to the organizer..."
+                        value={reviewNote}
+                        onChange={(e) => setReviewNote(e.target.value)}
+                        rows={3}
+                      />
 
-                <Divider />
+                      <HStack spacing={2}>
+                        <Button
+                          leftIcon={<EmailIcon />}
+                          colorScheme="blue"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSendMessage}
+                        >
+                          Send Message
+                        </Button>
+                      </HStack>
 
-                {/* Admin Actions */}
-                <Box>
-                  <Heading size="sm" mb={3}>Admin Actions</Heading>
-                  
-                  <VStack spacing={3} align="stretch">
-                    <Textarea
-                      placeholder="Add a note or message to the organizer..."
-                      value={reviewNote}
-                      onChange={(e) => setReviewNote(e.target.value)}
-                      rows={3}
-                    />
-
-                    <HStack spacing={2}>
-                      <Button
-                        leftIcon={<EmailIcon />}
-                        colorScheme="blue"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleSendMessage}
-                      >
-                        Send Message
-                      </Button>
-                    </HStack>
-
-                    {selectedRequest.status !== "approved" && selectedRequest.status !== "rejected" && (
-                      <Alert status="info" borderRadius="md">
-                        <AlertIcon />
-                        <Text fontSize="sm">
-                          Review the application details and update the status accordingly.
-                        </Text>
-                      </Alert>
-                    )}
-                  </VStack>
-                </Box>
-              </VStack>
+                      {selectedRequest.status !== "approved" &&
+                        selectedRequest.status !== "rejected" && (
+                          <Alert status="info" borderRadius="md">
+                            <AlertIcon />
+                            <Text fontSize="sm">
+                              Review the application details and update the
+                              status accordingly.
+                            </Text>
+                          </Alert>
+                        )}
+                    </VStack>
+                  </Box>
+                </VStack>
+              </SimpleGrid>
             </ModalBody>
 
-            <ModalFooter>
-              <HStack spacing={3}>
+            <ModalFooter pt={0} pb={4}>
+              <Flex w="100%" justify="flex-end" gap={2} flexWrap="wrap">
                 <Button variant="ghost" onClick={onClose}>
                   Close
                 </Button>
-                
-                {(selectedRequest.status === "submitted" || selectedRequest.status === "under_review") && (
+                {selectedRequest.status === "under_review" && (
                   <>
                     <Button
                       colorScheme="yellow"
@@ -569,7 +627,7 @@ const OrganizerRequestsAdmin: React.FC = () => {
                     </Button>
                   </>
                 )}
-              </HStack>
+              </Flex>
             </ModalFooter>
           </ModalContent>
         </Modal>

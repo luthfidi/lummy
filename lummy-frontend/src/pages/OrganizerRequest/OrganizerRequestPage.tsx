@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -19,8 +19,12 @@ import {
   Alert,
   AlertIcon,
   Progress,
+  Badge,
+  Icon,
+  HStack,
+  Circle,
 } from "@chakra-ui/react";
-import { CheckIcon, InfoIcon } from "@chakra-ui/icons";
+import { CheckIcon, InfoIcon, TimeIcon, EmailIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 
 interface OrganizerRequestData {
@@ -54,6 +58,13 @@ interface OrganizerRequestData {
   agreeFee: boolean;
 }
 
+interface ApplicationStatus {
+  status: "under_review" | "need_more_info" | "approved" | "rejected";
+  submittedAt: string;
+  lastUpdate: string;
+  message?: string;
+}
+
 const OrganizerRequestPage: React.FC = () => {
   const navigate = useNavigate();
   const toast = useToast();
@@ -82,7 +93,16 @@ const OrganizerRequestPage: React.FC = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [applicationStatus, setApplicationStatus] = useState<ApplicationStatus | null>(null);
   const totalSteps = 4;
+
+  // Check if user has already submitted an application (simulate with localStorage)
+  useEffect(() => {
+    const savedStatus = localStorage.getItem('organizerApplicationStatus');
+    if (savedStatus) {
+      setApplicationStatus(JSON.parse(savedStatus));
+    }
+  }, []);
 
   const handleInputChange = (field: keyof OrganizerRequestData, value: any) => {
     setFormData(prev => ({
@@ -150,15 +170,69 @@ const OrganizerRequestPage: React.FC = () => {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
+      
+      const newStatus: ApplicationStatus = {
+        status: "under_review",
+        submittedAt: new Date().toISOString(),
+        lastUpdate: new Date().toISOString(),
+        message: "Your application has been submitted successfully and is currently under review by our team."
+      };
+
+      setApplicationStatus(newStatus);
+      localStorage.setItem('organizerApplicationStatus', JSON.stringify(newStatus));
+
       toast({
         title: "Application Submitted!",
-        description: "Your organizer request has been submitted for review. We'll contact you within 3-5 business days.",
+        description: "Your organizer request has been submitted for review.",
         status: "success",
         duration: 5000,
         isClosable: true,
       });
-      navigate("/");
     }, 2000);
+  };
+
+  const handleBackToHome = () => {
+    navigate("/");
+  };
+
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case "under_review":
+        return {
+          color: "orange",
+          label: "Under Review",
+          description: "Your application is being reviewed by our team. We'll contact you within 3-5 business days.",
+          icon: TimeIcon,
+        };
+      case "need_more_info":
+        return {
+          color: "yellow",
+          label: "Additional Information Required",
+          description: "We need some additional information to process your application. Please check your email.",
+          icon: InfoIcon,
+        };
+      case "approved":
+        return {
+          color: "green",
+          label: "Application Approved",
+          description: "Congratulations! Your organizer application has been approved. You can now create events.",
+          icon: CheckIcon,
+        };
+      case "rejected":
+        return {
+          color: "red",
+          label: "Application Rejected",
+          description: "Unfortunately, your application was not approved. Please contact support for more details.",
+          icon: InfoIcon,
+        };
+      default:
+        return {
+          color: "gray",
+          label: "Unknown Status",
+          description: "",
+          icon: InfoIcon,
+        };
+    }
   };
 
   const categoryOptions = [
@@ -169,6 +243,158 @@ const OrganizerRequestPage: React.FC = () => {
   const organizerTypes = [
     "Individual", "PT", "CV", "Yayasan", "Komunitas", "Startup", "NGO"
   ];
+
+  // If application has been submitted, show status page
+  if (applicationStatus) {
+    const statusInfo = getStatusInfo(applicationStatus.status);
+
+    return (
+      <Container maxW="container.md" py={8}>
+        <VStack spacing={8} align="stretch">
+          {/* Header */}
+          <Box textAlign="center">
+            <Heading size="lg" mb={2}>Application Status</Heading>
+            <Text color="gray.600">
+              Track your organizer application progress
+            </Text>
+          </Box>
+
+          {/* Status Card */}
+          <Box bg="white" p={8} borderRadius="lg" borderWidth="1px" borderColor="gray.200" textAlign="center">
+            <VStack spacing={6}>
+              <Circle size="80px" bg={`${statusInfo.color}.100`} color={`${statusInfo.color}.500`}>
+                <Icon as={statusInfo.icon} boxSize={8} />
+              </Circle>
+
+              <VStack spacing={2}>
+                <Badge colorScheme={statusInfo.color} fontSize="lg" px={4} py={2} borderRadius="full">
+                  {statusInfo.label}
+                </Badge>
+                <Text fontSize="lg" color="gray.700" maxW="md">
+                  {statusInfo.description}
+                </Text>
+              </VStack>
+
+              {applicationStatus.message && (
+                <Alert status="info" borderRadius="md" maxW="md">
+                  <AlertIcon />
+                  <Text fontSize="sm" textAlign="left">
+                    {applicationStatus.message}
+                  </Text>
+                </Alert>
+              )}
+
+              <Divider />
+
+              <VStack spacing={2} fontSize="sm" color="gray.600">
+                <HStack>
+                  <Text fontWeight="medium">Submitted:</Text>
+                  <Text>{new Date(applicationStatus.submittedAt).toLocaleDateString()}</Text>
+                </HStack>
+                <HStack>
+                  <Text fontWeight="medium">Last Updated:</Text>
+                  <Text>{new Date(applicationStatus.lastUpdate).toLocaleDateString()}</Text>
+                </HStack>
+              </VStack>
+
+              <HStack spacing={4} mt={6}>
+                {applicationStatus.status === "approved" && (
+                  <Button colorScheme="green" onClick={() => navigate("/organizer")}>
+                    Go to Dashboard
+                  </Button>
+                )}
+                <Button variant="outline" onClick={handleBackToHome}>
+                  Back to Home
+                </Button>
+                {applicationStatus.status === "need_more_info" && (
+                  <Button 
+                    leftIcon={<EmailIcon />} 
+                    colorScheme="blue" 
+                    onClick={() => window.open(`mailto:${formData.email}`, '_blank')}
+                  >
+                    Check Email
+                  </Button>
+                )}
+              </HStack>
+            </VStack>
+          </Box>
+
+          {/* Timeline */}
+          <Box bg="white" p={6} borderRadius="lg" borderWidth="1px" borderColor="gray.200">
+            <Heading size="md" mb={4}>Application Timeline</Heading>
+            <VStack spacing={4} align="stretch">
+              <HStack>
+                <Circle size="12px" bg="green.500" />
+                <VStack align="start" spacing={0} flex="1">
+                  <Text fontWeight="medium">Application Submitted</Text>
+                  <Text fontSize="sm" color="gray.600">
+                    {new Date(applicationStatus.submittedAt).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </Text>
+                </VStack>
+              </HStack>
+
+              <HStack>
+                <Circle size="12px" bg={applicationStatus.status === "under_review" ? "orange.500" : "green.500"} />
+                <VStack align="start" spacing={0} flex="1">
+                  <Text fontWeight="medium">Under Review</Text>
+                  <Text fontSize="sm" color="gray.600">
+                    {applicationStatus.status === "under_review" 
+                      ? "Currently being reviewed by our team"
+                      : "Review completed"
+                    }
+                  </Text>
+                </VStack>
+              </HStack>
+
+              {applicationStatus.status !== "under_review" && (
+                <HStack>
+                  <Circle size="12px" bg={
+                    applicationStatus.status === "approved" ? "green.500" : 
+                    applicationStatus.status === "rejected" ? "red.500" : "yellow.500"
+                  } />
+                  <VStack align="start" spacing={0} flex="1">
+                    <Text fontWeight="medium">
+                      {applicationStatus.status === "approved" ? "Application Approved" :
+                       applicationStatus.status === "rejected" ? "Application Rejected" : 
+                       "Additional Information Required"}
+                    </Text>
+                    <Text fontSize="sm" color="gray.600">
+                      {new Date(applicationStatus.lastUpdate).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </Text>
+                  </VStack>
+                </HStack>
+              )}
+            </VStack>
+          </Box>
+
+          {/* Contact Information */}
+          <Alert status="info" borderRadius="md">
+            <AlertIcon />
+            <Box>
+              <Text fontWeight="medium">Need Help?</Text>
+              <Text fontSize="sm">
+                If you have any questions about your application, please contact our support team at support@lummy.com
+              </Text>
+            </Box>
+          </Alert>
+        </VStack>
+      </Container>
+    );
+  }
 
   return (
     <Container maxW="container.md" py={8}>
