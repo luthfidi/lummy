@@ -38,6 +38,8 @@ const Links = [
   { name: "Marketplace", path: "/marketplace" },
   { name: "My Tickets", path: "/tickets" },
   { name: "Organizer", path: "/admin" },
+  { name: "Organizer Request", path: "/organizer-request" },
+  { name: "Admin", path: "/organizer-requests-admin" },
   { name: "Profile", path: "/profile" },
 ];
 
@@ -51,6 +53,8 @@ const LinkGroups = [
   [
     { name: "My Tickets", path: "/tickets" },
     { name: "Organizer", path: "/admin" },
+    { name: "Organizer Request", path: "/organizer-request" },
+    { name: "Admin", path: "/organizer-requests-admin" },
     { name: "Profile", path: "/profile" },
   ],
 ];
@@ -312,35 +316,38 @@ export const Navbar: React.FC = () => {
           </HStack>
 
           {/* Actions Area - Wallet Button */}
-          <ConnectButton.Custom>
-            {({ openConnectModal, isConnected, openProfileModal, account }) => {
-              if (!isConnected) {
-                return (
-                  <Button
-                    variant="outline"
-                    colorScheme="purple"
-                    size={{ base: "sm", lg: "md" }}
-                    px={{ base: 2, md: 3, lg: 4 }}
-                    py={2}
-                    borderRadius="lg"
-                    onClick={openConnectModal}
-                    leftIcon={<Icon as={FaWallet} />}
-                  >
-                    <Text display={{ base: "none", sm: "block" }}>
-                      Connect Wallet
-                    </Text>
-                  </Button>
-                );
-              }
+          <HStack spacing={3}>
+            {/* Wallet Button */}
+            <ConnectButton.Custom>
+              {({ openConnectModal, isConnected, openProfileModal, account }) => {
+                if (!isConnected) {
+                  return (
+                    <Button
+                      variant="outline"
+                      colorScheme="purple"
+                      size={{ base: "sm", lg: "md" }}
+                      px={{ base: 2, md: 3, lg: 4 }}
+                      py={2}
+                      borderRadius="lg"
+                      onClick={openConnectModal}
+                      leftIcon={<Icon as={FaWallet} />}
+                    >
+                      <Text display={{ base: "none", sm: "block" }}>
+                        Connect Wallet
+                      </Text>
+                    </Button>
+                  );
+                }
 
-              return (
-                <ConnectedButton
-                  address={account?.address as `0x${string}`}
-                  onClick={openProfileModal}
-                />
-              );
-            }}
-          </ConnectButton.Custom>
+                return (
+                  <ConnectedButton
+                    address={account?.address as `0x${string}`}
+                    onClick={openProfileModal}
+                  />
+                );
+              }}
+            </ConnectButton.Custom>
+          </HStack>
         </Flex>
 
         {/* Mobile Navigation - Improved active indicators */}

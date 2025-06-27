@@ -15,6 +15,8 @@ import {
   EventManagement,
 } from "./pages/Admin";
 import { CheckInDashboard, ScannerPage } from "./pages/TicketManagement";
+import OrganizerRequestPage from "./pages/OrganizerRequest/OrganizerRequestPage";
+import OrganizerRequestsAdmin from "./pages/OrganizerRequest/OrganizerRequestsAdmin";
 import { Web3Provider } from "./services/Web3Provider";
 
 /**
@@ -52,6 +54,10 @@ function App() {
               path="/admin/events/:eventId/scanner"
               element={<ScannerPage />}
             />
+
+            {/* Organizer Request routes */}
+            <Route path="/organizer-request" element={<OrganizerRequestPage />} />
+            <Route path="/organizer-requests-admin" element={<OrganizerRequestsAdmin />} />
           </Routes>
         </Box>
         <Footer />
