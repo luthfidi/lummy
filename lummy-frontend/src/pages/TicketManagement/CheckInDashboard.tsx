@@ -196,7 +196,7 @@ const CheckInDashboard: React.FC = () => {
   };
 
   const handleStartScanning = () => {
-    navigate(`/admin/events/${eventId}/scanner`);
+    navigate(`/organizer/events/${eventId}/scanner`);
   };
 
   const handleSendReminders = () => {
@@ -230,7 +230,7 @@ const CheckInDashboard: React.FC = () => {
         <Button
           leftIcon={<ArrowBackIcon />}
           variant="ghost"
-          onClick={() => navigate(`/admin/events/${eventId}`)}
+          onClick={() => navigate(`/organizer/events/${eventId}`)}
         >
           Back
         </Button>
@@ -552,7 +552,7 @@ const CheckInDashboard: React.FC = () => {
       ) : (
         <Box textAlign="center" py={10}>
           <Text>Event not found</Text>
-          <Button mt={4} onClick={() => navigate("/admin")}>
+          <Button mt={4} onClick={() => navigate("/organizer")}>
             Back to Dashboard
           </Button>
         </Box>

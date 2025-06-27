@@ -209,7 +209,7 @@ const ScannerPage: React.FC = () => {
           <Button
             leftIcon={<ArrowBackIcon />}
             variant="ghost"
-            onClick={() => navigate(`/admin/events/${eventId}`)}
+            onClick={() => navigate(`/organizer/events/${eventId}`)}
           >
             Back
           </Button>

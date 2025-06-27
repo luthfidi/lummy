@@ -10,10 +10,10 @@ import { MyTicketsPage } from "./pages/MyTickets";
 import { MarketplacePage } from "./pages/Marketplace";
 import { ProfilePage } from "./pages/Profile";
 import {
-  AdminDashboard,
+  OrganizerDashboard,
   CreateEventForm,
   EventManagement,
-} from "./pages/Admin";
+} from "./pages/Organizer";
 import { CheckInDashboard, ScannerPage } from "./pages/TicketManagement";
 import OrganizerRequestPage from "./pages/OrganizerRequest/OrganizerRequestPage";
 import OrganizerRequestsAdmin from "./pages/OrganizerRequest/OrganizerRequestsAdmin";
@@ -40,18 +40,18 @@ function App() {
             <Route path="/tickets/:id" element={<MyTicketsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 
-            {/* Admin routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/events/create" element={<CreateEventForm />} />
-            <Route path="/admin/events/:id" element={<EventManagement />} />
+            {/* Organizer routes */}
+            <Route path="/organizer" element={<OrganizerDashboard />} />
+            <Route path="/organizer/events/create" element={<CreateEventForm />} />
+            <Route path="/organizer/events/:id" element={<EventManagement />} />
 
             {/* Ticket Management routes */}
             <Route
-              path="/admin/events/:eventId/check-in"
+              path="/organizer/events/:eventId/check-in"
               element={<CheckInDashboard />}
             />
             <Route
-              path="/admin/events/:eventId/scanner"
+              path="/organizer/events/:eventId/scanner"
               element={<ScannerPage />}
             />
 

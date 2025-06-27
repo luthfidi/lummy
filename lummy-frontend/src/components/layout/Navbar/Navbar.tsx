@@ -37,7 +37,7 @@ const Links = [
   { name: "Events", path: "/events" },
   { name: "Marketplace", path: "/marketplace" },
   { name: "My Tickets", path: "/tickets" },
-  { name: "Organizer", path: "/admin" },
+  { name: "Organizer", path: "/organizer" },
   { name: "Organizer Request", path: "/organizer-request" },
   { name: "Admin", path: "/organizer-requests-admin" },
   { name: "Profile", path: "/profile" },
@@ -52,7 +52,7 @@ const LinkGroups = [
   ],
   [
     { name: "My Tickets", path: "/tickets" },
-    { name: "Organizer", path: "/admin" },
+    { name: "Organizer", path: "/organizer" },
     { name: "Organizer Request", path: "/organizer-request" },
     { name: "Admin", path: "/organizer-requests-admin" },
     { name: "Profile", path: "/profile" },

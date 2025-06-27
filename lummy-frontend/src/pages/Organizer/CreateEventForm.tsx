@@ -21,10 +21,10 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import TicketTierCreator, {
   TicketTierInput,
-} from "../../components/admin/TicketTierCreator";
+} from "../../components/organizer/TicketTierCreator";
 import ResellSettings, {
   ResellSettingsData,
-} from "../../components/admin/ResellSettings";
+} from "../../components/organizer/ResellSettings";
 import { useSmartContract } from "../../hooks/useSmartContract";
 
 const CreateEventForm: React.FC = () => {
@@ -133,7 +133,7 @@ const CreateEventForm: React.FC = () => {
         });
 
         // For demo, directly redirect to dashboard
-        navigate("/admin");
+        navigate("/organizer");
       } else {
         toast({
           title: "Error creating event",
@@ -167,8 +167,8 @@ const CreateEventForm: React.FC = () => {
     console.log("Ticket Tiers:", ticketTiers);
     console.log("Resell Settings:", resellSettings);
 
-    // Redirect to admin dashboard
-    navigate("/admin");
+    // Redirect to organizer dashboard
+    navigate("/organizer");
   };
 
   return (
@@ -179,7 +179,7 @@ const CreateEventForm: React.FC = () => {
             aria-label="Go back"
             icon={<ArrowBackIcon />}
             variant="ghost"
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate("/organizer")}
           />
           <Heading size="lg">Create New Event</Heading>
         </HStack>
@@ -353,7 +353,7 @@ const CreateEventForm: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <Flex justify="flex-end">
             <HStack spacing={4}>
-              <Button variant="outline" onClick={() => navigate("/admin")}>
+              <Button variant="outline" onClick={() => navigate("/organizer")}>
                 Cancel
               </Button>
               <Button colorScheme="purple" type="submit" isLoading={loading}>

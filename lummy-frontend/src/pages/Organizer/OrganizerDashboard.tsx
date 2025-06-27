@@ -23,8 +23,8 @@ import { AddIcon, CalendarIcon } from "@chakra-ui/icons";
 import { FaTicketAlt, FaChartLine, FaUserCheck } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import SalesStatistics from "../../components/admin/SalesStatistics";
-// import EventStats from "../../components/admin/EventStats"; // optional if used later
+import SalesStatistics from "../../components/organizer/SalesStatistics";
+// import EventStats from "../../components/organizer/EventStats"; // optional if used later
 
 // Mock Events Data
 const mockEvents = [
@@ -139,7 +139,7 @@ const getBadgeColor = (status: string) => {
   }
 };
 
-const AdminDashboard: React.FC = () => {
+const OrganizerDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [selectedEvent, setSelectedEvent] = useState<string>("all");
   const cardBg = "white";
@@ -148,11 +148,11 @@ const AdminDashboard: React.FC = () => {
     selectedEvent === "all" ? mockSalesData : { ...mockSalesData }; // Add real filter later
 
   const handleCreateEvent = () => {
-    navigate("/admin/events/create");
+    navigate("/organizer/events/create");
   };
 
   const handleManageEvent = (eventId: string) => {
-    navigate(`/admin/events/${eventId}`);
+    navigate(`/organizer/events/${eventId}`);
   };
 
   const renderEventCards = (events: typeof mockEvents) => (
@@ -194,7 +194,7 @@ const AdminDashboard: React.FC = () => {
                   size="sm"
                   leftIcon={<Icon as={FaUserCheck} />}
                   onClick={() =>
-                    navigate(`/admin/events/${event.eventId}/check-in`)
+                    navigate(`/organizer/events/${event.eventId}/check-in`)
                   }
                 >
                   Check-in
@@ -311,4 +311,4 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-export default AdminDashboard;
+export default OrganizerDashboard;

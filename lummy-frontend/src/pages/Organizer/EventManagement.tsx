@@ -52,12 +52,16 @@ import { FaTicketAlt, FaChartBar, FaUsers, FaCog } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import SalesStatistics, {
   SalesData,
-} from "../../components/admin/SalesStatistics";
-import EventStats, { EventStatsData } from "../../components/admin/EventStats";
+} from "../../components/organizer/SalesStatistics";
+import EventStats, {
+  EventStatsData,
+} from "../../components/organizer/EventStats";
 import ResellSettings, {
   ResellSettingsData,
-} from "../../components/admin/ResellSettings";
-import AttendeeList, { Attendee } from "../../components/admin/AttendeeList";
+} from "../../components/organizer/ResellSettings";
+import AttendeeList, {
+  Attendee,
+} from "../../components/organizer/AttendeeList";
 import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
@@ -240,7 +244,7 @@ const EventManagement: React.FC = () => {
       isClosable: true,
     });
 
-    navigate("/admin");
+    navigate("/organizer");
   };
 
   // Handlers for editing and adding tiers
@@ -393,7 +397,7 @@ const EventManagement: React.FC = () => {
             aria-label="Go back"
             icon={<ArrowBackIcon />}
             variant="ghost"
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate("/organizer")}
           />
           <Skeleton height="40px" width="300px" />
         </HStack>
@@ -408,7 +412,7 @@ const EventManagement: React.FC = () => {
     return (
       <Container maxW="container.xl" py={8}>
         <Text>Event not found</Text>
-        <Button mt={4} onClick={() => navigate("/admin")}>
+        <Button mt={4} onClick={() => navigate("/organizer")}>
           Back to Dashboard
         </Button>
       </Container>
@@ -422,7 +426,7 @@ const EventManagement: React.FC = () => {
           aria-label="Go back"
           icon={<ArrowBackIcon />}
           variant="ghost"
-          onClick={() => navigate("/admin")}
+          onClick={() => navigate("/organizer")}
         />
         <Heading size="lg">Manage Event</Heading>
       </HStack>
@@ -453,7 +457,7 @@ const EventManagement: React.FC = () => {
             leftIcon={<EditIcon />}
             colorScheme="purple"
             variant="outline"
-            onClick={() => navigate(`/admin/events/${id}/edit`)}
+            onClick={() => navigate(`/organizer/events/${id}/edit`)}
           >
             Edit Event
           </Button>
@@ -626,7 +630,7 @@ const EventManagement: React.FC = () => {
               <HStack>
                 <Button
                   colorScheme="purple"
-                  onClick={() => navigate(`/admin/events/${id}/check-in`)}
+                  onClick={() => navigate(`/organizer/events/${id}/check-in`)}
                 >
                   Check-in Dashboard
                 </Button>
