@@ -30,40 +30,59 @@ import { useAccount, useBalance } from "wagmi";
 import { formatUnits } from "viem";
 import { IDRX_SEPOLIA } from "../../../constants";
 import { truncateAddress } from "../../../utils/string";
+import { useRole } from "../../../context/RoleContext";
+import RoleSwitcher from "../../common/RoleSwitcher";
 
-// Navigation links
-const Links = [
-  { name: "Home", path: "/" },
-  { name: "Events", path: "/events" },
-  { name: "Marketplace", path: "/marketplace" },
-  { name: "My Tickets", path: "/tickets" },
-  { name: "Organizer", path: "/organizer" },
-  { name: "Organizer Request", path: "/organizer-request" },
-  { name: "Admin", path: "/organizer-requests-admin" },
-  { name: "Profile", path: "/profile" },
-];
-
-// Group links for dropdown on medium screens
-const LinkGroups = [
-  [
+// Define navigation links for each role
+const getNavigationLinks = (role: string) => {
+  const baseLinks = [
     { name: "Home", path: "/" },
     { name: "Events", path: "/events" },
     { name: "Marketplace", path: "/marketplace" },
-  ],
-  [
     { name: "My Tickets", path: "/tickets" },
-    { name: "Organizer", path: "/organizer" },
-    { name: "Organizer Request", path: "/organizer-request" },
-    { name: "Admin", path: "/organizer-requests-admin" },
-    { name: "Profile", path: "/profile" },
-  ],
-];
+  ];
 
-// Final Improved Navbar Component
+  const roleSpecificLinks = {
+    customer: [
+      ...baseLinks,
+      { name: "Organizer Request", path: "/organizer-request" },
+      { name: "Profile", path: "/profile" },
+    ],
+    organizer: [
+      ...baseLinks,
+      { name: "Organizer", path: "/organizer" },
+      { name: "Profile", path: "/profile" },
+    ],
+    admin: [
+      ...baseLinks,
+      { name: "Admin", path: "/admin" },
+      { name: "Profile", path: "/profile" },
+    ],
+  };
+
+  return roleSpecificLinks[role as keyof typeof roleSpecificLinks] || roleSpecificLinks.customer;
+};
+
+// Group links for dropdown on medium screens
+const getGroupedLinks = (role: string) => {
+  const links = getNavigationLinks(role);
+  
+  // Split links into two groups for better organization
+  const firstHalf = links.slice(0, Math.ceil(links.length / 2));
+  const secondHalf = links.slice(Math.ceil(links.length / 2));
+  
+  return [firstHalf, secondHalf];
+};
+
 export const Navbar: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const location = useLocation();
   const { address } = useAccount();
+  const { role } = useRole();
+
+  // Get navigation links based on current role
+  const navigationLinks = getNavigationLinks(role);
+  const groupedLinks = getGroupedLinks(role);
 
   // Responsive display modes
   const displayMode = useBreakpointValue({
@@ -108,7 +127,6 @@ export const Navbar: React.FC = () => {
           bg: "purple.50",
         }}
         onClick={() => {
-          // Close mobile menu if open when clicking on a link
           if (isOpen) onClose();
         }}
         fontSize={{ base: "sm", lg: "md" }}
@@ -134,9 +152,7 @@ export const Navbar: React.FC = () => {
     address: `0x${string}`;
     onClick: () => void;
   }> = ({ address, onClick }) => {
-    // Compact version for small screens
     if (displayMode === "mobile" || displayMode === "compact") {
-      // Manually truncate address for smaller display
       const shortAddress = address.slice(0, 6) + "..." + address.slice(-4);
       return (
         <Tooltip label={`${Number(formatted).toLocaleString()} IDRX`} hasArrow>
@@ -155,7 +171,6 @@ export const Navbar: React.FC = () => {
       );
     }
 
-    // Medium screen version with just wallet icon + balance
     if (displayMode === "grouped") {
       return (
         <Popover trigger="hover" placement="bottom-end">
@@ -187,7 +202,6 @@ export const Navbar: React.FC = () => {
       );
     }
 
-    // Full version for large screens
     return (
       <Button
         bg="purple.500"
@@ -204,7 +218,7 @@ export const Navbar: React.FC = () => {
   };
 
   // Navigation Link Groups for medium screens
-  const NavLinkGroup = ({ links }: { links: typeof Links }) => {
+  const NavLinkGroup = ({ links }: { links: typeof navigationLinks }) => {
     const firstLink = links[0];
     const isAnyActive = links.some((link) => location.pathname === link.path);
 
@@ -293,7 +307,7 @@ export const Navbar: React.FC = () => {
                 spacing={3}
                 display={{ base: "none", lg: "flex" }}
               >
-                {Links.map((link) => (
+                {navigationLinks.map((link) => (
                   <NavLink key={link.name} to={link.path}>
                     {link.name}
                   </NavLink>
@@ -308,15 +322,18 @@ export const Navbar: React.FC = () => {
                 spacing={2}
                 display={{ base: "none", md: "flex", lg: "none" }}
               >
-                {LinkGroups.map((group, idx) => (
+                {groupedLinks.map((group, idx) => (
                   <NavLinkGroup key={idx} links={group} />
                 ))}
               </HStack>
             )}
           </HStack>
 
-          {/* Actions Area - Wallet Button */}
+          {/* Actions Area - Role Switcher & Wallet Button */}
           <HStack spacing={3}>
+            {/* Role Switcher */}
+            <RoleSwitcher />
+
             {/* Wallet Button */}
             <ConnectButton.Custom>
               {({ openConnectModal, isConnected, openProfileModal, account }) => {
@@ -350,7 +367,7 @@ export const Navbar: React.FC = () => {
           </HStack>
         </Flex>
 
-        {/* Mobile Navigation - Improved active indicators */}
+        {/* Mobile Navigation */}
         {isOpen && (
           <Box
             pb={4}
@@ -365,7 +382,7 @@ export const Navbar: React.FC = () => {
             px={4}
           >
             <Stack as="nav" spacing={2}>
-              {Links.map((link) => {
+              {navigationLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
                   <Box
@@ -383,7 +400,6 @@ export const Navbar: React.FC = () => {
                       textDecoration: "none",
                     }}
                     onClick={() => {
-                      // Always close menu when clicking a link on mobile
                       onClose();
                     }}
                     position="relative"
