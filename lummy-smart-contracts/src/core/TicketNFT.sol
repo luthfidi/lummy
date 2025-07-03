@@ -26,6 +26,9 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
     mapping(uint256 => Structs.TicketMetadata) public ticketMetadata;
     mapping(uint256 => uint256) public transferCount;
     
+    // Tambahan: mapping status burned
+    mapping(uint256 => bool) public isBurned;
+    
     // Secret salt for QR challenge
     bytes32 private immutable _secretSalt;
     
@@ -193,8 +196,25 @@ contract TicketNFT is ITicketNFT, ERC721Enumerable, ReentrancyGuard, Ownable {
         return super.supportsInterface(interfaceId);
     }
     
+    // Fungsi burn NFT
+    function burn(uint256 tokenId) external nonReentrant {
+        if (!_isApprovedOrOwner(msg.sender, tokenId)) revert NotApprovedOrOwner();
+        if (!_tokenExists(tokenId)) revert TicketDoesNotExist();
+        _burn(tokenId);
+        isBurned[tokenId] = true;
+        emit TicketBurned(msg.sender, tokenId, block.timestamp);
+    }
+    
+    // Fungsi generate dynamic QR hanya jika sudah burn
+    function generateDynamicQR(uint256 tokenId) external view returns (bytes32) {
+        if (!isBurned[tokenId]) revert("TicketNotBurned");
+        uint256 timeBlock = block.timestamp / 1800; // 30 menit
+        return keccak256(abi.encodePacked(tokenId, msg.sender, timeBlock, _secretSalt));
+    }
+    
     // Events
     event TicketMinted(uint256 indexed tokenId, address indexed to, uint256 tierId);
     event TicketTransferred(uint256 indexed tokenId, address indexed from, address indexed to);
     event TicketUsed(uint256 indexed tokenId, address indexed user);
+    event TicketBurned(address indexed user, uint256 indexed tokenId, uint256 timestamp);
 }
